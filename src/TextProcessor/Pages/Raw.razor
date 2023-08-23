@@ -1,0 +1,31 @@
+﻿@page "/raw"
+@page "/raw/{index}"
+@inject RawViewModel ViewModel
+
+<div>
+    <RadzenLabel Component="DropDown_FileName" Text="表示するファイル名" />
+    <RadzenDropDown TValue="DsvFileInfo" Name="DropDown_FileName" Data="ViewModel.Files" @bind-Value="ViewModel.SelectedData.Value" TextProperty="Name" />
+</div>
+
+@if (ViewModel.SelectedData.Value is not null)
+{
+    <div>
+        <DsvView Data="ViewModel.SelectedData.Value.Data" />
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? Index { get; set; }
+
+    /// <inheritdoc/>
+    protected async override Task OnInitializedAsync()
+    {
+        await ViewModel.InitializeAsync();
+
+        if (int.TryParse(Index, out int index) && index >= 0 && index < ViewModel.Files.Count)
+        {
+            ViewModel.SelectedData.Value = ViewModel.Files[index];
+        }
+    }
+}

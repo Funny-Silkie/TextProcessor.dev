@@ -1,0 +1,17 @@
+﻿@using TextProcessor.Logics.Operations
+@inject DialogService DialogService
+
+<div class="my-4">
+    <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center">
+        <RadzenListBox TValue="Operation" Style="height: calc(70vh - 200px)" Data="ViewModel.Source" @bind-Value="ViewModel.SelectedOperation.Value" TextProperty="Title" />
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+            <RadzenButton Text="OK" Click="ViewModel.CommandOk.ToAsyncDelegate()" />
+            <RadzenButton Text="Cancel" Click="ViewModel.CommandCancel.ToAsyncDelegate()" />
+        </RadzenStack>
+    </RadzenStack>
+</div>
+
+@code {
+    [Inject]
+    public AddOperationViewModel ViewModel { get; private set; } = default!;
+}

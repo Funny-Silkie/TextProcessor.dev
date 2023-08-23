@@ -1,0 +1,22 @@
+﻿@using TextProcessor.Logics.Operations;
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.End">
+    <RadzenAccordion Style="width: 100%">
+        <Items>
+            <RadzenAccordionItem Style="background: whitesmoke" Text="@(ViewModel.Title)">
+                <RadzenStack>
+                    @foreach (ArgumentInfo arg in ViewModel.Arguments)
+                    {
+                        <ArgumentEdit Argument="arg" />
+                    }
+                </RadzenStack>
+            </RadzenAccordionItem>
+        </Items>
+    </RadzenAccordion>
+    <RadzenButton Style="top: 0.5rem" Icon="delete" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" Click="ViewModel.RemoveSelfCommand.ToAsyncDelegate()" />
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public required OperationViewModel ViewModel { get; set; }
+}

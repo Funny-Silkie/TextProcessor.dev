@@ -1,0 +1,29 @@
+﻿@{
+    TextData? data = Data;
+    if (data is not null)
+    {
+        IEnumerable<TextColumnData> columns = data.GetColumns();
+        IEnumerable<List<string>>? rows = data.GetDataRows().Select(x => x.ToList());
+        TextRowData header = data.Header!;
+        <RadzenDataGrid Style="@(Style)" TItem="IList<string>" Data="rows" GridLines="DataGridGridLines.Both" AllowColumnResize="true" ColumnWidth="200px">
+            <Columns>
+                @foreach (TextColumnData column in columns)
+                {
+                    <RadzenDataGridColumn TItem="IList<string>" Title="@(data.HasHeader ? header[column.Index] : string.Empty)" Width="150px">
+                        <Template>
+                            @(column.Index < context.Count ? context[column.Index] : string.Empty)
+                        </Template>
+                    </RadzenDataGridColumn>
+                }
+            </Columns>
+        </RadzenDataGrid>
+    }
+}
+
+@code {
+    [Parameter]
+    public required TextData? Data { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+}

@@ -1,0 +1,50 @@
+﻿@using TextProcessor.Logics.Operations
+
+@typeparam TValue where TValue : IHasDefinedSet<TValue>, IHasArguments
+
+<RadzenPanel AllowCollapse="true">
+    <HeaderTemplate>
+        <RadzenDropDown Name="@(Name)" TValue="string" Data="names" Value="@(Value?.Title)" ValueChanged="OnValueChanged" />
+    </HeaderTemplate>
+    <ChildContent>
+        @foreach (ArgumentInfo arg in Value.Arguments)
+        {
+            <ArgumentEdit Argument="arg" />
+        }
+    </ChildContent>
+</RadzenPanel>
+
+@code {
+    private string?[] names = default!;
+    private TValue[] source = default!;
+
+    /// <inheritdoc cref="DataBoundFormComponent{T}.Name"/>
+    [Parameter]
+    public string? Name { get; set; }
+
+    /// <inheritdoc cref="DataBoundFormComponent{T}.Value"/>
+    [Parameter]
+    public required TValue Value { get; set; }
+
+    /// <inheritdoc cref="DataBoundFormComponent{T}.ValueChanged"/>
+    [Parameter]
+    public EventCallback<TValue> ValueChanged { get; set; }
+
+    /// <inheritdoc/>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        source = TValue.GetDefinedSet();
+        names = Array.ConvertAll(source, x => x.Title);
+    }
+
+    /// <summary>
+    /// <see cref="Value"/>の変更を通知します。
+    /// </summary>
+    /// <param name="value">変更後の値</param>
+    private async Task OnValueChanged(string? value)
+    {
+        await ValueChanged.InvokeAsync(source.First(x => x.Title == value));
+    }
+}

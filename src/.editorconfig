@@ -1,0 +1,13 @@
+﻿[*.{cs,vb}]
+
+# IDE0046: 条件式に変換します
+dotnet_diagnostic.IDE0046.severity = silent
+
+# IDE0045: 条件式を使用する
+dotnet_diagnostic.IDE0045.severity = silent
+
+# IDE0046: 条件式を使用する
+dotnet_diagnostic.IDE0046.severity = silent
+
+# IDE0090: new(...)式を使用する
+dotnet_diagnostic.IDE0090.severity = silent

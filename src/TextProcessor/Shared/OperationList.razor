@@ -1,0 +1,32 @@
+﻿<RadzenStack Style="@(Style)" Gap="3px">
+    @foreach (OperationViewModel operation in Source)
+    {
+        <OperationItem ViewModel="operation" />
+    }
+</RadzenStack>
+
+@code {
+    /// <summary>
+    /// 処理一覧を取得または設定します。
+    /// </summary>
+    [Parameter]
+    public IEnumerable<OperationViewModel> Source { get; set; } = default!;
+
+    /// <summary>
+    /// スタイルを取得または設定します。
+    /// </summary>
+    [Parameter]
+    public string? Style { get; set; }
+
+    /// <inheritdoc/>
+    protected override async Task OnInitializedAsync()
+    {
+        AsyncMessageBroker.Default.Subscribe<ReRenderMessage>(async x =>
+        {
+            if (x.Target == "op-list") StateHasChanged();
+            await Task.CompletedTask;
+        });
+
+        await Task.CompletedTask;
+    }
+}

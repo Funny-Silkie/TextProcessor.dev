@@ -1,0 +1,30 @@
+﻿@page "/load"
+@inject LoadViewModel ViewModel
+
+<div>
+    <RadzenLabel Component="RadioButtonList_Delimiter" Text="行区切り文字" />
+    <RadzenRadioButtonList Name="RadioButtonList_Delimiter" TValue="RowDelimiter" @bind-Value="ViewModel.Delimiter.Value">
+        <Items>
+            <RadzenRadioButtonListItem Text="タブ文字" Value="@(RowDelimiter.Tab)" />
+            <RadzenRadioButtonListItem Text="カンマ" Value="@(RowDelimiter.Comma)" />
+            <RadzenRadioButtonListItem Text="その他" Value="@(RowDelimiter.Others)" />
+        </Items>
+    </RadzenRadioButtonList>
+</div>
+<div>
+    <RadzenTextBox Name="TextBox_OtherDelimiter" @bind-Value="ViewModel.OtherDelimiter.Value" Disabled="!ViewModel.IsOtherDelimiter.Value" />
+    <RadzenLabel Component="TextBox_OtherDelimiter" Text="その他行区切り文字" />
+</div>
+<div>
+    <RadzenCheckBox Name="CheckBox_HasHeader" TValue="bool" @bind-Value="ViewModel.HasHeader.Value" />
+    <RadzenLabel Component="CheckBox_HasHeader" Text="先頭行をヘッダーとして扱う" />
+</div>
+
+<InputFile OnChange="ViewModel.LoadCommand.ToAsyncDelegate()" />
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.InitializeAsync();
+    }
+}

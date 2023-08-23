@@ -1,0 +1,85 @@
+﻿@page "/edit"
+@inject EditViewModel ViewModel
+@inject DialogService DialogService
+
+<RadzenStack>
+    <div>
+        <RadzenDropDown Name="DropDown_SelectedFile" TValue="DsvFileInfo" Data="ViewModel.Files" @bind-Value="ViewModel.EditingFile.Value" TextProperty="Name" />
+        <RadzenLabel Component="DropDown_SelectedFile" Text="編集するファイル" />
+    </div>
+    <RadzenSplitter Style="width: calc(100vw - 320px)" Collapse="UpdateLogCollapsed" Expand="UpdateLogCollapsed">
+        <RadzenSplitterPane Style="height: calc(100vh - 75px)" Size="500px">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="0" JustifyContent="JustifyContent.End" Style="height: 100%">
+                <OperationList Style="height: 100%; background-color: lightgray; overflow: auto; padding-left: 5px; padding-top: 5px" Source="ViewModel.Operations" />
+                <RadzenStack Style="padding: 1rem" Orientation="Orientation.Horizontal" Gap="1rem">
+                    <RadzenButton Text="追加" ButtonStyle="ButtonStyle.Primary" Disabled="ViewModel.EditingFile.Value is null" Click="OpenAddOperationDialog" />
+                    <RadzenButton Text="処理実行" ButtonStyle="ButtonStyle.Success" IsBusy="isInOpeartionProgress" Disabled="ViewModel.EditingFile.Value is null" Click="ExecuteOperation" />
+                    <RadzenButton Text="処理スキップ" ButtonStyle="ButtonStyle.Light" Disabled="ViewModel.EditingFile.Value is null" Click="ViewModel.AsRawCommand.ToAsyncDelegate()" />
+                    <RadzenButton Icon="file_download" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" IsBusy="isInOpeartionProgress" Disabled="ViewModel.EditingFile.Value is null" Click="StartDownload" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenSplitterPane>
+        <RadzenSplitterPane Size="calc(100% - 800px)">
+            @if (ViewModel.ViewData.Value is not null)
+            {
+                <DsvView Style="max-height: calc(100vh - 75px)" Data="ViewModel.ViewData.Value" />
+            }
+            else if (ViewModel.Files.Count > 0)
+            {
+                <h2>編集するファイルを選択してください</h2>
+            }
+            else
+            {
+                <h2>ファイルを読み込んでください</h2>
+            }
+        </RadzenSplitterPane>
+        <RadzenSplitterPane @ref="logSplitterPane" Size="300px" Collapsed="ViewModel.LogTableCollapsed.Value">
+            <LogTable Style="max-height: calc(100vh - 75px); padding-left: 5px" Data="ViewModel.LogList" />
+        </RadzenSplitterPane>
+    </RadzenSplitter>
+</RadzenStack>
+
+@code {
+    private bool isInOpeartionProgress;
+    private RadzenSplitterPane? logSplitterPane;
+
+    private async Task OpenAddOperationDialog()
+    {
+        var options = new DialogOptions()
+            {
+                Width = "50vw",
+                Height = "70vh",
+            };
+        AddOperationViewModel? vm = await DialogService.OpenAsync<AddOperation>("処理の追加", null, options);
+
+        if (vm is null) return;
+        await ViewModel.EndAddOperationCommand.ExecuteAsync(vm);
+    }
+
+    private async Task UpdateLogCollapsed()
+    {
+        if (logSplitterPane is null) return;
+        ViewModel.LogTableCollapsed.Value = (bool)(typeof(RadzenSplitterPane).GetProperty("IsCollapsible", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(logSplitterPane)!);
+        await Task.CompletedTask;
+    }
+
+    private async Task ExecuteOperation()
+    {
+        isInOpeartionProgress = true;
+        await ViewModel.OperateCommand.ExecuteAsync();
+        isInOpeartionProgress = false;
+    }
+
+    private async Task StartDownload()
+    {
+        isInOpeartionProgress = true;
+        await ViewModel.DownloadCommand.ExecuteAsync();
+        isInOpeartionProgress = false;
+    }
+
+    /// <inheritdoc/>
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.InitializeAsync();
+    }
+}

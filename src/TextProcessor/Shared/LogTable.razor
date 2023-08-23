@@ -1,0 +1,58 @@
+﻿<RadzenStack Style="@(Style)">
+    <div>
+        <h4>ログ一覧</h4>
+    </div>
+    <RadzenDataGrid TItem="LogInfo" AllowColumnResize="true" Data="Data">
+        <Columns>
+            <RadzenDataGridColumn TItem="LogInfo" Property="LogType" MinWidth="70px">
+                <Template>
+                    @switch (context.Type)
+                    {
+                        case LogType.Info:
+                            <RadzenStack Gap="3px" Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                                <RadzenIcon Icon="info" IconStyle="IconStyle.Primary" />
+                                <span>メッセージ</span>
+                            </RadzenStack>
+                            break;
+                        case LogType.Warning:
+                            <RadzenStack Gap="3px" Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                                <RadzenIcon Icon="warning" IconStyle="IconStyle.Warning" />
+                                <span>警告</span>
+                            </RadzenStack>
+                            break;
+                        case LogType.Error:
+                            <RadzenStack Gap="3px" Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                                <RadzenIcon Icon="error" IconStyle="IconStyle.Danger" />
+                                <span>エラー</span>
+                            </RadzenStack>
+                            break;
+                        case LogType.Success:
+                            <RadzenStack Gap="3px" Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                                <RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" />
+                                <span>成功</span>
+                            </RadzenStack>
+                            break;
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="LogInfo" Title="メッセージ" Width="calc(60% - 150px)">
+                <Template>
+                    <div style="white-space: pre-wrap">@context.Message</div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="LogInfo" Title="発生箇所" Width="40%">
+                <Template>
+                    <div style="white-space: pre-wrap">@context.Target</div>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public required IEnumerable<LogInfo> Data { get; set; }
+}
