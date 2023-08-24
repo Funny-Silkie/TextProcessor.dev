@@ -29,6 +29,12 @@ namespace TextProcessor.ViewModels
         /// <inheritdoc cref="RemoveSelf"/>
         public AsyncReactiveCommand RemoveSelfCommand { get; }
 
+        /// <inheritdoc cref="DownLocation"/>
+        public AsyncReactiveCommand DownLocationCommand { get; }
+
+        /// <inheritdoc cref="UpLocation"/>
+        public AsyncReactiveCommand UpLocationCommand { get; }
+
         #endregion Commands
 
         /// <summary>
@@ -44,6 +50,10 @@ namespace TextProcessor.ViewModels
 
             RemoveSelfCommand = new AsyncReactiveCommand().WithSubscribe(RemoveSelf)
                                                           .AddTo(DisposableList);
+            DownLocationCommand = new AsyncReactiveCommand().WithSubscribe(DownLocation)
+                                                            .AddTo(DisposableList);
+            UpLocationCommand = new AsyncReactiveCommand().WithSubscribe(UpLocation)
+                                                          .AddTo(DisposableList);
         }
 
         /// <summary>
@@ -52,6 +62,22 @@ namespace TextProcessor.ViewModels
         private async Task RemoveSelf()
         {
             await editViewModel.RemoveOperation(this);
+        }
+
+        /// <summary>
+        /// 一つ下へ移動します。
+        /// </summary>
+        private async Task DownLocation()
+        {
+            await editViewModel.DownLocation(this);
+        }
+
+        /// <summary>
+        /// 一つ上へ移動します。
+        /// </summary>
+        private async Task UpLocation()
+        {
+            await editViewModel.UpLocation(this);
         }
     }
 }

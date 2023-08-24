@@ -10,7 +10,7 @@
     <RadzenSplitter Style="width: calc(100vw - 320px)" Collapse="UpdateLogCollapsed" Expand="UpdateLogCollapsed">
         <RadzenSplitterPane Style="height: calc(100vh - 75px)" Size="500px">
             <RadzenStack Orientation="Orientation.Vertical" Gap="0" JustifyContent="JustifyContent.End" Style="height: 100%">
-                <OperationList Style="height: 100%; background-color: lightgray; overflow: auto; padding-left: 5px; padding-top: 5px" Source="ViewModel.Operations" />
+                <OperationList Style="height: 100%; background-color: lightgray; overflow: auto; padding-left: 5px; padding-top: 5px; padding-right: 5px" Source="ViewModel.Operations" />
                 <RadzenStack Style="padding: 1rem" Orientation="Orientation.Horizontal" Gap="1rem">
                     <RadzenButton Text="追加" ButtonStyle="ButtonStyle.Primary" Disabled="ViewModel.EditingFile.Value is null" Click="OpenAddOperationDialog" />
                     <RadzenButton Text="処理実行" ButtonStyle="ButtonStyle.Success" IsBusy="isInOpeartionProgress" Disabled="ViewModel.EditingFile.Value is null" Click="ExecuteOperation" />

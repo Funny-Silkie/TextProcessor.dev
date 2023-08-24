@@ -1,20 +1,27 @@
 ﻿@using TextProcessor.Logics.Operations;
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.End">
-    <RadzenAccordion Style="width: 100%">
-        <Items>
-            <RadzenAccordionItem Style="background: whitesmoke" Text="@(ViewModel.Title)">
-                <RadzenStack>
-                    @foreach (ArgumentInfo arg in ViewModel.Arguments)
-                    {
-                        <ArgumentEdit Argument="arg" />
-                    }
-                </RadzenStack>
-            </RadzenAccordionItem>
-        </Items>
-    </RadzenAccordion>
-    <RadzenButton Style="top: 0.5rem" Icon="delete" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" Click="ViewModel.RemoveSelfCommand.ToAsyncDelegate()" />
-</RadzenStack>
+<RadzenPanel Style="background: whitesmoke" AllowCollapse="true">
+    <HeaderTemplate>
+        <RadzenStack Style="width: 100%" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenText Text="@(ViewModel.Title)" />
+            <RadzenStack Style="padding-right: 15px; margin-top: -5px" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start">
+                <RadzenButton Icon="arrow_downward" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" Click="ViewModel.DownLocationCommand.ToAsyncDelegate()" />
+                <RadzenButton Icon="arrow_upward" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" Click="ViewModel.UpLocationCommand.ToAsyncDelegate()" />
+                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" Click="ViewModel.RemoveSelfCommand.ToAsyncDelegate()" />
+            </RadzenStack>
+        </RadzenStack>
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenPanel Style="background: white">
+            <RadzenStack>
+                @foreach (ArgumentInfo arg in ViewModel.Arguments)
+                {
+                    <ArgumentEdit Argument="arg" />
+                }
+            </RadzenStack>
+        </RadzenPanel>
+    </ChildContent>
+</RadzenPanel>
 
 @code {
     [Parameter]
