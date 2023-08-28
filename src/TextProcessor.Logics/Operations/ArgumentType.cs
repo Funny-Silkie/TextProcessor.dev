@@ -1,66 +1,72 @@
-﻿using System;
+using System;
 
 namespace TextProcessor.Logics.Operations
 {
     /// <summary>
     /// 引数の種類を表します。
     /// </summary>
+    [Flags]
     [Serializable]
     public enum ArgumentType
     {
         /// <summary>
         /// 文字列
         /// </summary>
-        String,
+        String = 1 << 0,
 
         /// <summary>
         /// 文字列（複数行）
         /// </summary>
-        StringMultiLine,
+        StringMultiLine = 1 << 1,
 
         /// <summary>
         /// 整数
         /// </summary>
-        Integer,
+        Integer = 1 << 2,
 
         /// <summary>
         /// 整数
         /// </summary>
-        Integer64,
+        Integer64 = 1 << 3,
 
         /// <summary>
         /// 小数
         /// </summary>
-        Decimal,
+        Decimal = 1 << 4,
 
         /// <summary>
         /// 1-baseなインデックス
         /// </summary>
-        Index,
+        Index = 1 << 5,
 
         /// <summary>
         /// 真偽値
         /// </summary>
-        Boolean,
+        Boolean = 1 << 6,
 
         /// <summary>
         /// 値の条件
         /// </summary>
-        ValueCondition,
+        ValueCondition = 1 << 7,
 
         /// <summary>
         /// 行の条件
         /// </summary>
-        RowCondition,
+        RowCondition = 1 << 8,
 
         /// <summary>
         /// 引数セット
         /// </summary>
-        Arguments,
+        Arguments = 1 << 9,
 
         /// <summary>
         /// テキストデータ
         /// </summary>
-        TextData,
+        TextData = 1 << 10,
+
+        /// <summary>
+        /// 固定長配列（<see cref="System.Array"/>）
+        /// </summary>
+        Array = 1 << 11,
     }
 }

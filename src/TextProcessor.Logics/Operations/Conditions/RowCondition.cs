@@ -154,8 +154,7 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class AndRowCondition : RowCondition
     {
-        private RowCondition cond1;
-        private RowCondition cond2;
+        private RowCondition[] conditions;
 
         /// <inheritdoc/>
         public override string? Title => "AND";
@@ -165,7 +164,8 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public AndRowCondition()
         {
-            cond1 = cond2 = Null;
+            conditions = new RowCondition[2];
+            Array.Fill(conditions, Null);
         }
 
         /// <summary>
@@ -177,8 +177,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         private AndRowCondition(AndRowCondition cloned)
             : base(cloned)
         {
-            cond1 = cloned.cond1.Clone();
-            cond2 = cloned.cond2.Clone();
+            conditions = cloned.conditions.CloneAll();
         }
 
         /// <inheritdoc/>
@@ -189,26 +188,29 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.RowCondition, "条件1", () => cond1, x => cond1 = x),
-                new ArgumentInfo(ArgumentType.RowCondition, "条件2", () => cond2, x => cond2 = x),
+                new ArgumentInfo(ArgumentType.RowCondition | ArgumentType.Array, "条件", () => conditions, x => conditions = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            StatusHelper.VerifyRowCondition(Title, status, Arguments[0], cond1);
-            StatusHelper.VerifyRowCondition(Title, status, Arguments[1], cond2);
+            for (int i = 0; i < conditions.Length; i++)
+            {
+                StatusHelper.VerifyRowCondition(Title, status, Arguments[0], conditions[i]);
+            }
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(IList<string> target)
         {
-            MatchResult match1 = cond1.Match(target);
-            MatchResult match2 = cond2.Match(target);
-            if ((match1 | match2).HasFlag(MatchResult.Error)) return MatchResult.Error;
-            if ((match1 | match2) == MatchResult.Matched) return MatchResult.Matched;
-            return MatchResult.NotMatched;
+            foreach (RowCondition currentCondition in conditions)
+            {
+                MatchResult currentResult = currentCondition.Match(target);
+                if (currentResult != MatchResult.Matched) return currentResult;
+            }
+
+            return MatchResult.Matched;
         }
     }
 
@@ -218,8 +220,7 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class OrRowCondition : RowCondition
     {
-        private RowCondition cond1;
-        private RowCondition cond2;
+        private RowCondition[] conditions;
 
         /// <inheritdoc/>
         public override string? Title => "OR";
@@ -229,7 +230,8 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public OrRowCondition()
         {
-            cond1 = cond2 = Null;
+            conditions = new RowCondition[2];
+            Array.Fill(conditions, Null);
         }
 
         /// <summary>
@@ -241,8 +243,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         private OrRowCondition(OrRowCondition cloned)
             : base(cloned)
         {
-            cond1 = cloned.cond1.Clone();
-            cond2 = cloned.cond2.Clone();
+            conditions = cloned.conditions.CloneAll();
         }
 
         /// <inheritdoc/>
@@ -253,25 +254,28 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.RowCondition, "条件1", () => cond1, x => cond1 = x),
-                new ArgumentInfo(ArgumentType.RowCondition, "条件2", () => cond2, x => cond2 = x),
+                new ArgumentInfo(ArgumentType.RowCondition | ArgumentType.Array, "条件", () => conditions, x => conditions = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            StatusHelper.VerifyRowCondition(Title, status, Arguments[0], cond1);
-            StatusHelper.VerifyRowCondition(Title, status, Arguments[1], cond2);
+            for (int i = 0; i < conditions.Length; i++)
+            {
+                StatusHelper.VerifyRowCondition(Title, status, Arguments[0], conditions[i]);
+            }
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(IList<string> target)
         {
-            MatchResult match1 = cond1.Match(target);
-            MatchResult match2 = cond2.Match(target);
-            if ((match1 | match2).HasFlag(MatchResult.Error)) return MatchResult.Error;
-            if ((match1 | match2).HasFlag(MatchResult.Matched)) return MatchResult.Matched;
+            foreach (RowCondition currentCondition in conditions)
+            {
+                MatchResult currentResult = currentCondition.Match(target);
+                if (currentResult != MatchResult.NotMatched) return currentResult;
+            }
+
             return MatchResult.NotMatched;
         }
     }
