@@ -50,16 +50,17 @@ namespace TextProcessor.Logics
         /// </summary>
         /// <param name="value">分割する文字列</param>
         /// <param name="separator">行区切り文字</param>
+        /// <param name="capacity">リストの初期容量</param>
         /// <returns>分割後の文字列一覧</returns>
         /// <exception cref="ArgumentNullException"><paramref name="separator"/>が<see langword="null"/></exception>
         /// <exception cref="ArgumentException"><paramref name="separator"/>が空文字</exception>
         /// <exception cref="RegexMatchTimeoutException">正規表現検索時にタイムアウトが発生</exception>
-        public List<string> Split(string value, string separator)
+        public List<string> Split(string value, string separator, int capacity = 0)
         {
             ArgumentException.ThrowIfNullOrEmpty(separator);
 
             Regex regex = GetSplitRegex(separator);
-            return regex.Matches(value).Select(x => x.Value).ToList();
+            return regex.Matches(value).Select(x => x.Value).ToList(capacity);
         }
 
         /// <summary>

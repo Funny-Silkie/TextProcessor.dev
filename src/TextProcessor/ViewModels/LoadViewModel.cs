@@ -106,16 +106,18 @@ namespace TextProcessor.ViewModels
 
             try
             {
-                using Stream stream = e.File.OpenReadStream();
-                using var memoryStream = new MemoryStream();
-                await stream.CopyToAsync(memoryStream);
-                memoryStream.Position = 0;
-                await mainModel.LoadFile(e.File.Name, memoryStream, new TextLoadOptions(HasHeader.Value, delimiter));
+                using Stream stream = e.File.OpenReadStream(e.File.Size);
+
+                await mainModel.LoadFile(e.File.Name, stream, new TextLoadOptions(HasHeader.Value, delimiter));
             }
-            catch
+            catch (Exception _e)
             {
+#if DEBUG
+                throw;
+#else
                 notificationService.Notify(NotificationSeverity.Error, "ファイル読み込み時にエラーが発生しました");
                 return;
+#endif
             }
             NavigateTo("edit");
         }

@@ -68,10 +68,12 @@ namespace TextProcessor.Logics.Data
             var logic = new DsvLogic();
 
             using var reader = new StreamReader(stream);
-            while (!reader.EndOfStream)
+            int capacity = 0;
+            string? line;
+            while ((line = reader.ReadLine()) is not null)
             {
-                string line = reader.ReadLine()!;
-                List<string> values = logic.Split(line, options.Separator);
+                List<string> values = logic.Split(line, options.Separator, capacity);
+                capacity = Math.Max(capacity, values.Capacity);
                 result.items.Add(values);
             }
 
@@ -91,10 +93,12 @@ namespace TextProcessor.Logics.Data
             var logic = new DsvLogic();
 
             using var reader = new StreamReader(stream);
-            while (!reader.EndOfStream)
+            int capacity = 0;
+            string? line;
+            while ((line = await reader.ReadLineAsync()) is not null)
             {
-                string line = (await reader.ReadLineAsync())!;
-                List<string> values = logic.Split(line, options.Separator);
+                List<string> values = logic.Split(line, options.Separator, capacity);
+                capacity = Math.Max(capacity, values.Capacity);
                 result.items.Add(values);
             }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TextProcessor.Logics
 {
@@ -46,6 +47,22 @@ namespace TextProcessor.Logics
         {
             var result = new List<T>(list.Capacity);
             for (int i = 0; i < list.Count; i++) result.Add((T)list[i].Clone());
+            return result;
+        }
+
+        /// <summary>
+        /// <see cref="List{T}"/>に変換します。
+        /// </summary>
+        /// <typeparam name="T">コレクションの要素の型</typeparam>
+        /// <param name="source">ソース</param>
+        /// <param name="capacity">初期容量</param>
+        /// <returns>変換後のインスタンス</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="source"/>が<see langword="null"/></exception>
+        public static List<T> ToList<T>(this IEnumerable<T> source, int capacity)
+        {
+            if (capacity <= 0) return source.ToList();
+            var result = new List<T>(capacity);
+            result.AddRange(source);
             return result;
         }
     }
