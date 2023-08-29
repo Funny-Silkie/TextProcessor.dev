@@ -49,11 +49,14 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
+            if (count < 0) status.Errors.Add(new StatusEntry(Title, Arguments[0], "行数が負の値です"));
         }
 
         /// <inheritdoc/>
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
+            if (count < 0) return;
+
             List<List<string>> list = data.GetSourceData();
 
             int offset = data.HasHeader ? 1 : 0;
