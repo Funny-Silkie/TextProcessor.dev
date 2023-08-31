@@ -72,7 +72,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
             IEqualityComparer<string> comparer = caseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
             List<List<string>> dataList = data.GetSourceData();
             List<List<string>> targetList = target.GetSourceData();
-            int joinOffset = dataList.Max(x => x.Count);
+            int joinOffset = data.ColumnCount;
             int dataStart = data.HasHeader ? 1 : 0;
             int targetStart = target.HasHeader ? 1 : 0;
 
