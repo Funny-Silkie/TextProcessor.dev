@@ -49,6 +49,8 @@ namespace TextProcessor.Logics.Operations
                 new FilterRowOperation(RowCondition.Null),
                 new HeadOperation(),
                 new TailOperation(),
+                new SkipHeadOperation(),
+                new SkipTailOperation(),
                 new SelectColumnOperation(),
                 new ReplaceOperation(),
                 new SortOperation(),
