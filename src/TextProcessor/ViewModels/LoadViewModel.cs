@@ -4,12 +4,14 @@ using Radzen;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using TextProcessor.Data;
 using TextProcessor.Logics.Data.Options;
 using TextProcessor.Models;
+using TextProcessor.Shared;
 
 namespace TextProcessor.ViewModels
 {
@@ -19,6 +21,7 @@ namespace TextProcessor.ViewModels
     [InjectionRange(InjectionType.Transient)]
     public class LoadViewModel : PageViewModel
     {
+        private readonly DialogService dialogService;
         private readonly NotificationService notificationService;
         private readonly MainModel mainModel;
 
@@ -58,9 +61,10 @@ namespace TextProcessor.ViewModels
         /// <summary>
         /// <see cref="LoadViewModel"/>の新しいインスタンスを初期化します。
         /// </summary>
-        public LoadViewModel(NavigationManager navigationManager, MainModel mainModel, NotificationService notificationService)
+        public LoadViewModel(NavigationManager navigationManager, MainModel mainModel, NotificationService notificationService, DialogService dialogService)
             : base(navigationManager)
         {
+            this.dialogService = dialogService;
             this.mainModel = mainModel;
             this.notificationService = notificationService;
 
@@ -104,13 +108,25 @@ namespace TextProcessor.ViewModels
                 return;
             }
 
+            dialogService.Open<WaitingDialog>(string.Empty, new Dictionary<string, object>()
+            {
+                [nameof(WaitingDialog.Message)] = "読込中",
+            }, new DialogOptions()
+            {
+                Width = "300px",
+                Height = "200px",
+                CloseDialogOnEsc = false,
+                CloseDialogOnOverlayClick = false,
+                ShowClose = false,
+            });
+
             try
             {
                 using Stream stream = e.File.OpenReadStream(e.File.Size);
 
                 await mainModel.LoadFile(e.File.Name, stream, new TextLoadOptions(HasHeader.Value, delimiter));
             }
-            catch (Exception _e)
+            catch
             {
 #if DEBUG
                 throw;
@@ -118,6 +134,10 @@ namespace TextProcessor.ViewModels
                 notificationService.Notify(NotificationSeverity.Error, "ファイル読み込み時にエラーが発生しました");
                 return;
 #endif
+            }
+            finally
+            {
+                dialogService.Close();
             }
             NavigateTo("edit");
         }
