@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Radzen;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
@@ -297,6 +297,48 @@ namespace TextProcessor.ViewModels
             });
         }
 
+        /// <summary>
+        /// 処理を一つ下に移動します。
+        /// </summary>
+        /// <param name="operation">移動する処理</param>
+        public async Task DownLocation(OperationViewModel operation)
+        {
+            if (EditingFile.Value is null) return;
+            int index = Operations.IndexOf(operation);
+            if (index < 0 || index == Operations.Count - 1) return;
+            OperationViewModel swapped = Operations[index + 1];
+            Operations.MoveOnScheduler(index, index + 1);
+            List<Operation> list = EditingFile.Value.Operations;
+            list[index] = swapped.Operation;
+            list[index + 1] = operation.Operation;
+
+            await AsyncMessageBroker.Default.PublishAsync(new ReRenderMessage()
+            {
+                Target = "op-list",
+            });
+        }
+
+        /// <summary>
+        /// 処理を一つ上に移動します。
+        /// </summary>
+        /// <param name="operation">移動する処理</param>
+        public async Task UpLocation(OperationViewModel operation)
+        {
+            if (EditingFile.Value is null) return;
+            int index = Operations.IndexOf(operation);
+            if (index <= 0) return;
+            OperationViewModel swapped = Operations[index - 1];
+            Operations.MoveOnScheduler(index, index - 1);
+            List<Operation> list = EditingFile.Value.Operations;
+            list[index] = swapped.Operation;
+            list[index - 1] = operation.Operation;
+
+            await AsyncMessageBroker.Default.PublishAsync(new ReRenderMessage()
+            {
+                Target = "op-list",
+            });
+        }
+
         /// <inheritdoc/>
         public override async Task InitializeAsync()
         {
@@ -309,23 +351,23 @@ namespace TextProcessor.ViewModels
             {
                 var data1 = TextData.CreateFromRawData(new[]
                 {
-                new[] { "Index", "Name", "Age", },
-                new[] { "1", "Tanaka", "20", },
-                new[] { "2", "Sato", "43", },
-                new[] { "3", "Suzuki", "33", },
-                new[] { "4", "Yamada", "16", },
-            });
+                    new[] { "Index", "Name", "Age", },
+                    new[] { "1", "Tanaka", "20", },
+                    new[] { "2", "Sato", "43", },
+                    new[] { "3", "Suzuki", "33", },
+                    new[] { "4", "Yamada", "16", },
+                });
                 data1.HasHeader = true;
                 var info1 = new DsvFileInfo("test1.tsv", data1);
                 mainModel.Files.AddOnScheduler(info1);
                 var data2 = TextData.CreateFromRawData(new[]
                 {
-                new[] { "Index", "Address", },
-                new[] { "3", "Osaka", },
-                new[] { "1", "Nagoya", },
-                new[] { "2", "Tokyo", },
-                new[] { "5", "Yokohama" },
-            });
+                    new[] { "Index", "Address", },
+                    new[] { "3", "Osaka", },
+                    new[] { "1", "Nagoya", },
+                    new[] { "2", "Tokyo", },
+                    new[] { "5", "Yokohama" },
+                });
                 data2.HasHeader = true;
                 var info2 = new DsvFileInfo("test2.tsv", data2);
                 mainModel.Files.AddOnScheduler(info2);

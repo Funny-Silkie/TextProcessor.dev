@@ -22,6 +22,16 @@ namespace TextProcessor.Logics.Data
         public bool HasHeader { get; set; }
 
         /// <summary>
+        /// 行数を取得します。
+        /// </summary>
+        public int RowCount => items.Count;
+
+        /// <summary>
+        /// 列数を取得します。
+        /// </summary>
+        public int ColumnCount => items.Count == 0 ? 0 : items.Max(x => x.Count);
+
+        /// <summary>
         /// ヘッダー行を取得します。
         /// </summary>
         public TextRowData? Header => HasHeader ? new TextRowData(this, 0, version) : null;
@@ -68,10 +78,12 @@ namespace TextProcessor.Logics.Data
             var logic = new DsvLogic();
 
             using var reader = new StreamReader(stream);
-            while (!reader.EndOfStream)
+            int capacity = 0;
+            string? line;
+            while ((line = reader.ReadLine()) is not null)
             {
-                string line = reader.ReadLine()!;
-                List<string> values = logic.Split(line, options.Separator);
+                List<string> values = logic.Split(line, options.Separator, capacity);
+                capacity = Math.Max(capacity, values.Capacity);
                 result.items.Add(values);
             }
 
@@ -91,10 +103,12 @@ namespace TextProcessor.Logics.Data
             var logic = new DsvLogic();
 
             using var reader = new StreamReader(stream);
-            while (!reader.EndOfStream)
+            int capacity = 0;
+            string? line;
+            while ((line = await reader.ReadLineAsync()) is not null)
             {
-                string line = (await reader.ReadLineAsync())!;
-                List<string> values = logic.Split(line, options.Separator);
+                List<string> values = logic.Split(line, options.Separator, capacity);
+                capacity = Math.Max(capacity, values.Capacity);
                 result.items.Add(values);
             }
 
@@ -174,7 +188,7 @@ namespace TextProcessor.Logics.Data
         /// <returns>全ての列</returns>
         public IEnumerable<TextColumnData> GetColumns()
         {
-            for (int i = 0; i < items.Max(x => x.Count); i++) yield return new TextColumnData(this, i, version);
+            for (int i = 0; i < ColumnCount; i++) yield return new TextColumnData(this, i, version);
         }
 
         /// <summary>

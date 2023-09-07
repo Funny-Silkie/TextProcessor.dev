@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace TextProcessor.Logics.Operations
 {
@@ -16,12 +16,17 @@ namespace TextProcessor.Logics.Operations
         /// <summary>
         /// 数値を表すかどうかを取得します。
         /// </summary>
-        public bool IsNumber => Type is ArgumentType.Integer or ArgumentType.Integer64 or ArgumentType.Decimal or ArgumentType.Index;
+        public bool IsNumber => (Type & (ArgumentType.Integer | ArgumentType.Integer64 | ArgumentType.Decimal | ArgumentType.Index)) != 0;
 
         /// <summary>
         /// 条件を表すかどうかを取得します。
         /// </summary>
-        public bool IsCondition => Type is ArgumentType.ValueCondition or ArgumentType.RowCondition;
+        public bool IsCondition => (Type & (ArgumentType.ValueCondition | ArgumentType.RowCondition)) != 0;
+
+        /// <summary>
+        /// 固定長配列を表すかどうかを取得します。
+        /// </summary>
+        public bool IsArray => Type.HasFlag(ArgumentType.Array);
 
         /// <summary>
         /// 引数名を取得します。
@@ -31,7 +36,7 @@ namespace TextProcessor.Logics.Operations
         /// <summary>
         /// 値のゲッターを取得します。
         /// </summary>
-        public Func<dynamic> Gettter { get; }
+        public Func<dynamic> Getter { get; }
 
         /// <summary>
         /// 値のセッターを取得します。
@@ -43,7 +48,7 @@ namespace TextProcessor.Logics.Operations
         /// </summary>
         public dynamic Value
         {
-            get => Gettter.Invoke();
+            get => Getter.Invoke();
             set => Setter.Invoke(value);
         }
 
@@ -55,16 +60,14 @@ namespace TextProcessor.Logics.Operations
         /// <param name="gettter">ゲッター関数</param>
         /// <param name="setter">セッター関数</param>
         /// <exception cref="ArgumentNullException"><paramref name="gettter"/>または<paramref name="setter"/>が<see langword="null"/></exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="type"/>が未定義</exception>
         public ArgumentInfo(ArgumentType type, string? name, Func<dynamic> gettter, Action<dynamic> setter)
         {
             ArgumentNullException.ThrowIfNull(gettter);
             ArgumentNullException.ThrowIfNull(setter);
-            if (!Enum.IsDefined(type)) throw new ArgumentOutOfRangeException(nameof(type));
 
             Type = type;
             Name = name;
-            Gettter = gettter;
+            Getter = gettter;
             Setter = setter;
         }
     }

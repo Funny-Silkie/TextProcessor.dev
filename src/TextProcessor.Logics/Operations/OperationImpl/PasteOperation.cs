@@ -60,7 +60,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
 
             List<List<string>> dataList = data.GetSourceData();
             List<List<string>> targetList = target.GetSourceData();
-            int pastedOffset = dataList.Max(x => x.Count);
+            int pastedOffset = data.ColumnCount;
 
             int dataIndex = data.HasHeader ? 1 : 0;
             int targetIndex = target.HasHeader ? 1 : 0;

@@ -1,0 +1,84 @@
+﻿@using TextProcessor.Logics.Operations
+@using TextProcessor.Logics.Operations.Conditions
+
+<RadzenLabel Component="@(ComponentName)" Text="@(Name)" />
+@switch (ValueType)
+{
+    case ArgumentType.String:
+        <RadzenTextBox Name="@(ComponentName)" Value="@(Getter.Invoke())" ValueChanged="x => Setter.Invoke(x)" />
+        break;
+    case ArgumentType.StringMultiLine:
+        <RadzenTextArea Name="@(ComponentName)" Value="@(Getter.Invoke())" ValueChanged="x => Setter.Invoke(x)" />
+        break;
+    case ArgumentType.Integer:
+        <RadzenNumeric TValue="int" Name="@(ComponentName)" Value="Getter.Invoke()" ValueChanged="x => Setter.Invoke(x)" />
+        break;
+    case ArgumentType.Integer64:
+        <RadzenNumeric TValue="long" Name="@(ComponentName)" Value="Getter.Invoke()" ValueChanged="x => Setter.Invoke(x)" />
+        break;
+    case ArgumentType.Decimal:
+        <RadzenNumeric TValue="double" Name="@(ComponentName)" Value="Getter.Invoke()" ValueChanged="x => Setter.Invoke(x)" />
+        break;
+    case ArgumentType.Index:
+        <RadzenNumeric TValue="int" Name="@(ComponentName)" Value="@(Getter.Invoke() + 1)" Min="1" ValueChanged="x => Setter.Invoke(x - 1)" />
+        break;
+    case ArgumentType.Boolean:
+        <RadzenCheckBox TValue="bool" Name="@(ComponentName)" Value="@(Getter.Invoke())" ValueChanged="x => Setter.Invoke(x)" />
+        break;
+    case ArgumentType.ValueCondition:
+        <ConditionEdit TValue="ValueCondition" Name="@(ComponentName)" Value="@(Getter.Invoke())" ValueChanged="x => Setter.Invoke(x)" />
+        break;
+    case ArgumentType.RowCondition:
+        <ConditionEdit TValue="RowCondition" Name="@(ComponentName)" Value="@(Getter.Invoke())" ValueChanged="x => Setter.Invoke(x)" />
+        break;
+    case ArgumentType.Arguments:
+        <RadzenPanel Name="@(ComponentName)">
+            <RadzenStack>
+                @foreach (ArgumentInfo arg in ((IHasArguments)Getter.Invoke()).Arguments)
+                {
+                    <ArgumentEdit Argument="arg" />
+                }
+            </RadzenStack>
+        </RadzenPanel>
+        break;
+    case ArgumentType.TextData:
+        <RadzenDropDown TValue="DsvFileInfo" Name="@(ComponentName)" Data="ViewModel.Files" Value="@(ViewModel.Files.FirstOrDefault(x => x.Data == Getter.Invoke()))" ValueChanged="x => Setter.Invoke(x.Data)" TextProperty="Name" />
+        break;
+}
+@code {
+    /// <summary>
+    /// ViewModelを取得または設定します。
+    /// </summary>
+    [Parameter]
+    public required ArgumentEditViewModel ViewModel { get; set; }
+
+    /// <summary>
+    /// 値の種類を取得または設定します。
+    /// </summary>
+    [Parameter]
+    public required ArgumentType ValueType { get; set; }
+
+    /// <summary>
+    /// 編集名を取得または設定します。
+    /// </summary>
+    [Parameter]
+    public required string Name { get; set; }
+
+    /// <summary>
+    /// 編集コンポーネント名を取得または設定します。
+    /// </summary>
+    [Parameter]
+    public required string ComponentName { get; set; }
+
+    /// <summary>
+    /// ゲッター関数を取得または設定します。
+    /// </summary>
+    [Parameter]
+    public required Func<dynamic> Getter { get; set; }
+
+    /// <summary>
+    /// セッター関数を取得または設定します。
+    /// </summary>
+    [Parameter]
+    public required Action<dynamic> Setter { get; set; }
+}

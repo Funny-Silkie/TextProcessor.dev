@@ -5,37 +5,37 @@ using TextProcessor.Logics.Data;
 namespace TextProcessor.Logics.Operations.OperationImpl
 {
     /// <summary>
-    /// 先頭の行を取得する処理を表します。
+    /// 先頭の行をスキップする処理を表します。
     /// </summary>
     [Serializable]
-    internal class HeadOperation : Operation
+    internal class SkipHeadOperation : Operation
     {
         private int count = 1;
 
         /// <inheritdoc/>
-        public override string Title => "先頭から指定した行数ぶん取得";
+        public override string Title => "先頭から指定した行数ぶんスキップ";
 
         /// <summary>
-        /// <see cref="HeadOperation"/>の新しいインスタンスを初期化します。
+        /// <see cref="SkipHeadOperation"/>の新しいインスタンスを初期化します。
         /// </summary>
-        public HeadOperation()
+        public SkipHeadOperation()
         {
         }
 
         /// <summary>
-        /// <see cref="HeadOperation"/>の新しいインスタンスを初期化します。
+        /// <see cref="SkipHeadOperation"/>の新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="cloned">複製するインスタンス</param>
         /// <remarks>クローン用</remarks>
         /// <exception cref="ArgumentNullException"><paramref name="cloned"/>が<see langword="null"/></exception>
-        protected HeadOperation(HeadOperation cloned)
+        protected SkipHeadOperation(SkipHeadOperation cloned)
             : base(cloned)
         {
             count = cloned.count;
         }
 
         /// <inheritdoc/>
-        protected override Operation CloneCore() => new HeadOperation(this);
+        protected override Operation CloneCore() => new SkipHeadOperation(this);
 
         /// <inheritdoc/>
         protected override IList<ArgumentInfo> GenerateArguments()
@@ -56,13 +56,21 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
             if (count < 0) return;
+            if (count == 0)
+            {
+                status.Warnings.Add(new StatusEntry(Title, null, "スキップされた行はありません"));
+                return;
+            }
 
             List<List<string>> list = data.GetSourceData();
-            int actualCount = count;
-            if (data.HasHeader) actualCount++;
-
-            if (actualCount >= list.Count) return;
-            list.RemoveRange(actualCount, list.Count - actualCount);
+            int startIndex = data.HasHeader ? 1 : 0;
+            if (startIndex + count >= list.Count)
+            {
+                list.RemoveRange(startIndex, list.Count - startIndex);
+                status.Warnings.Add(new StatusEntry(Title, null, "全ての行がスキップされました"));
+                return;
+            }
+            list.RemoveRange(startIndex, count);
         }
     }
 }

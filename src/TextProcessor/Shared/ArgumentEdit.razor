@@ -1,59 +1,35 @@
-﻿@using TextProcessor.Logics.Operations;
+﻿@using System.Collections;
+@using TextProcessor.Logics.Operations;
 @using TextProcessor.Logics.Operations.Conditions;
 
 @inject ArgumentEditViewModel ViewModel
 
 <div>
     @{
-        string componentName = $"Arg_{Argument.Name}";
-        <RadzenLabel Component="@(componentName)" Text="@(Argument.Name)" />
-        switch (Argument.Type)
+        @if (Argument.Type.HasFlag(ArgumentType.Array))
         {
-            case ArgumentType.String:
-                <RadzenTextBox Name="@(componentName)" Value="@(Argument.Value)" ValueChanged="x => Argument.Setter.Invoke(x)" />
-                break;
-            case ArgumentType.StringMultiLine:
-                <RadzenTextArea Name="@(componentName)" Value="@(Argument.Value)" ValueChanged="x => Argument.Setter.Invoke(x)" />
-                break;
-            case ArgumentType.Integer:
-                <RadzenNumeric TValue="int" Name="@(componentName)" Value="Argument.Value" ValueChanged="x => Argument.Setter.Invoke(x)" />
-                break;
-            case ArgumentType.Integer64:
-                <RadzenNumeric TValue="long" Name="@(componentName)" Value="Argument.Value" ValueChanged="x => Argument.Setter.Invoke(x)" />
-                break;
-            case ArgumentType.Decimal:
-                <RadzenNumeric TValue="double" Name="@(componentName)" Value="Argument.Value" ValueChanged="x => Argument.Setter.Invoke(x)" />
-                break;
-            case ArgumentType.Index:
-                <RadzenNumeric TValue="int" Name="@(componentName)" Value="@(Argument.Value + 1)" Min="1" ValueChanged="x => Argument.Setter.Invoke(x - 1)" />
-                break;
-            case ArgumentType.Boolean:
-                <RadzenCheckBox TValue="bool" Name="@(componentName)" Value="@(Argument.Value)" ValueChanged="x => Argument.Setter.Invoke(x)" />
-                break;
-            case ArgumentType.ValueCondition:
-                <ConditionEdit TValue="ValueCondition" Name="@(componentName)" Value="@(Argument.Value)" ValueChanged="x => Argument.Setter.Invoke(x)" />
-                break;
-            case ArgumentType.RowCondition:
-                <ConditionEdit TValue="RowCondition" Name="@(componentName)" Value="@(Argument.Value)" ValueChanged="x => Argument.Setter.Invoke(x)" />
-                break;
-            case ArgumentType.Arguments:
-                <RadzenPanel Name="@(componentName)">
-                    <RadzenStack>
-                        @foreach (ArgumentInfo arg in ((IHasArguments)Argument.Value).Arguments)
-                        {
-                            <ArgumentEdit Argument="arg" />
-                        }
-                    </RadzenStack>
-                </RadzenPanel>
-                break;
-            case ArgumentType.TextData:
-                <RadzenDropDown TValue="DsvFileInfo" Name="@(componentName)" Data="ViewModel.Files" Value="@(ViewModel.Files.FirstOrDefault(x => x.Data == Argument.Value))" ValueChanged="x => Argument.Setter.Invoke(x.Data)" TextProperty="Name" />
-                break;
-            default:
-                break;
+            if (!string.IsNullOrEmpty(Argument.Name))
+            {
+                <div>
+                    <RadzenLabel Text="@(Argument.Name)" />
+                </div>
+            }
+            Array array = Argument.Getter.Invoke();
+            ArgumentType type = Argument.Type ^ ArgumentType.Array;
+            for (int i = 0; i < array.Length; i++)
+            {
+                int index = i;
+                <ArgumentEditEntry ViewModel="ViewModel" Name="@($"{i + 1}:")" ComponentName="@($"Arg_{Argument.Name}_{i}")" ValueType="type" Getter="() => array.GetValue(index)" Setter="x => array.SetValue(x, index)" />
+            }
+        }
+        else
+        {
+            <ArgumentEditEntry ViewModel="ViewModel" Name="@(Argument.Name)" ComponentName="@($"Arg_{Argument.Name}")" ValueType="Argument.Type" Getter="Argument.Getter" Setter="Argument.Setter" />
         }
     }
 </div>
+
+
 
 @code {
     [Parameter]

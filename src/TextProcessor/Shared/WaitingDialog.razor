@@ -1,0 +1,9 @@
+﻿<RadzenStack AlignItems="AlignItems.Center" Gap="1rem">
+    <RadzenText Text="@(Message)" />
+    <RadzenProgressBarCircular ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public string? Message { get; set; }
+}

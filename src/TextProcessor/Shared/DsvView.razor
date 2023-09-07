@@ -5,7 +5,7 @@
         IEnumerable<TextColumnData> columns = data.GetColumns();
         IEnumerable<List<string>>? rows = data.GetDataRows().Select(x => x.ToList());
         TextRowData header = data.Header!;
-        <RadzenDataGrid Style="@(Style)" TItem="IList<string>" Data="rows" GridLines="DataGridGridLines.Both" AllowColumnResize="true" ColumnWidth="200px">
+        <RadzenDataGrid Style="@(Style)" TItem="IList<string>" Data="rows" GridLines="DataGridGridLines.Both" AllowPaging="true" PageSize="50" AllowColumnResize="true" ColumnWidth="200px">
             <Columns>
                 @foreach (TextColumnData column in columns)
                 {
