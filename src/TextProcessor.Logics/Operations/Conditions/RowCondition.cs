@@ -44,9 +44,9 @@ namespace TextProcessor.Logics.Operations.Conditions
                 new NotRowCondition(),
                 new OrRowCondition(),
                 new AndRowCondition(),
-                new CheckValueRowCondition(0, ValueCondition.Null),
-                new CheckAllValueRowCondition(ValueCondition.Null),
-                new CheckAnyValueRowCondition(ValueCondition.Null),
+                new CheckValueRowCondition(),
+                new CheckAllValueRowCondition(),
+                new CheckAnyValueRowCondition(),
             };
         }
 
@@ -92,7 +92,10 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class NotRowCondition : RowCondition
     {
-        private RowCondition condition;
+        /// <summary>
+        /// 反転する条件を取得または設定します。
+        /// </summary>
+        public RowCondition Condition { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "NOT";
@@ -102,7 +105,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public NotRowCondition()
         {
-            condition = Null;
+            Condition = Null;
         }
 
         /// <summary>
@@ -114,7 +117,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         private NotRowCondition(NotRowCondition cloned)
             : base(cloned)
         {
-            condition = cloned.condition.Clone();
+            Condition = cloned.Condition.Clone();
         }
 
         /// <inheritdoc/>
@@ -125,20 +128,20 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.RowCondition, "条件", () => condition, x => condition = x),
+                new ArgumentInfo(ArgumentType.RowCondition, "条件", () => Condition, x => Condition = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            StatusHelper.VerifyRowCondition(Title, status, Arguments[0], condition);
+            StatusHelper.VerifyRowCondition(Title, status, Arguments[0], Condition);
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(IList<string> target)
         {
-            MatchResult match = condition.Match(target);
+            MatchResult match = Condition.Match(target);
             return match switch
             {
                 MatchResult.Matched => MatchResult.NotMatched,
@@ -154,7 +157,10 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class AndRowCondition : RowCondition
     {
-        private RowCondition[] conditions;
+        /// <summary>
+        /// 対象の条件一覧を取得または設定します。
+        /// </summary>
+        public RowCondition[] Conditions { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "AND";
@@ -164,8 +170,8 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public AndRowCondition()
         {
-            conditions = new RowCondition[2];
-            Array.Fill(conditions, Null);
+            Conditions = new RowCondition[2];
+            Array.Fill(Conditions, Null);
         }
 
         /// <summary>
@@ -177,7 +183,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         private AndRowCondition(AndRowCondition cloned)
             : base(cloned)
         {
-            conditions = cloned.conditions.CloneAll();
+            Conditions = cloned.Conditions.CloneAll();
         }
 
         /// <inheritdoc/>
@@ -188,23 +194,23 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.RowCondition | ArgumentType.Array, "条件", () => conditions, x => conditions = x),
+                new ArgumentInfo(ArgumentType.RowCondition | ArgumentType.Array, "条件", () => Conditions, x => Conditions = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            for (int i = 0; i < conditions.Length; i++)
+            for (int i = 0; i < Conditions.Length; i++)
             {
-                StatusHelper.VerifyRowCondition(Title, status, Arguments[0], conditions[i]);
+                StatusHelper.VerifyRowCondition(Title, status, Arguments[0], Conditions[i]);
             }
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(IList<string> target)
         {
-            foreach (RowCondition currentCondition in conditions)
+            foreach (RowCondition currentCondition in Conditions)
             {
                 MatchResult currentResult = currentCondition.Match(target);
                 if (currentResult != MatchResult.Matched) return currentResult;
@@ -220,7 +226,10 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class OrRowCondition : RowCondition
     {
-        private RowCondition[] conditions;
+        /// <summary>
+        /// 対象の条件一覧を取得または設定します。
+        /// </summary>
+        public RowCondition[] Conditions { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "OR";
@@ -230,8 +239,8 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public OrRowCondition()
         {
-            conditions = new RowCondition[2];
-            Array.Fill(conditions, Null);
+            Conditions = new RowCondition[2];
+            Array.Fill(Conditions, Null);
         }
 
         /// <summary>
@@ -243,7 +252,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         private OrRowCondition(OrRowCondition cloned)
             : base(cloned)
         {
-            conditions = cloned.conditions.CloneAll();
+            Conditions = cloned.Conditions.CloneAll();
         }
 
         /// <inheritdoc/>
@@ -254,23 +263,23 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.RowCondition | ArgumentType.Array, "条件", () => conditions, x => conditions = x),
+                new ArgumentInfo(ArgumentType.RowCondition | ArgumentType.Array, "条件", () => Conditions, x => Conditions = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            for (int i = 0; i < conditions.Length; i++)
+            for (int i = 0; i < Conditions.Length; i++)
             {
-                StatusHelper.VerifyRowCondition(Title, status, Arguments[0], conditions[i]);
+                StatusHelper.VerifyRowCondition(Title, status, Arguments[0], Conditions[i]);
             }
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(IList<string> target)
         {
-            foreach (RowCondition currentCondition in conditions)
+            foreach (RowCondition currentCondition in Conditions)
             {
                 MatchResult currentResult = currentCondition.Match(target);
                 if (currentResult != MatchResult.NotMatched) return currentResult;
@@ -286,8 +295,15 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class CheckValueRowCondition : RowCondition
     {
-        private int valueIndex;
-        private ValueCondition valueCondition;
+        /// <summary>
+        /// 対象の列インデックスを取得または設定します。
+        /// </summary>
+        public int ColumnIndex { get; set; }
+
+        /// <summary>
+        /// 値に適用する条件を取得または設定します。
+        /// </summary>
+        public ValueCondition ValueCondition { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "指定した列のセルが条件を満たす";
@@ -295,17 +311,10 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// <summary>
         /// <see cref="CheckValueRowCondition"/>の新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="valueIndex">検証する値のインデックス</param>
-        /// <param name="valueCondition">値に対する条件</param>
-        /// <exception cref="ArgumentNullException"><paramref name="valueCondition"/>が<see langword="null"/></exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="valueIndex"/>が0未満</exception>
-        public CheckValueRowCondition(int valueIndex, ValueCondition valueCondition)
+        public CheckValueRowCondition()
         {
-            ArgumentNullException.ThrowIfNull(valueCondition);
-            if (valueIndex < 0) throw new ArgumentOutOfRangeException(nameof(valueIndex));
-
-            this.valueIndex = valueIndex;
-            this.valueCondition = valueCondition;
+            ColumnIndex = 0;
+            ValueCondition = ValueCondition.Null;
         }
 
         /// <summary>
@@ -317,8 +326,8 @@ namespace TextProcessor.Logics.Operations.Conditions
         private CheckValueRowCondition(CheckValueRowCondition cloned)
             : base(cloned)
         {
-            valueIndex = cloned.valueIndex;
-            valueCondition = cloned.valueCondition.Clone();
+            ColumnIndex = cloned.ColumnIndex;
+            ValueCondition = cloned.ValueCondition.Clone();
         }
 
         /// <inheritdoc/>
@@ -329,22 +338,22 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Index, "列番号", () => valueIndex, x => valueIndex = x),
-                new ArgumentInfo(ArgumentType.ValueCondition, "条件", () => valueCondition, x => valueCondition = x),
+                new ArgumentInfo(ArgumentType.Index, "列番号", () => ColumnIndex, x => ColumnIndex = x),
+                new ArgumentInfo(ArgumentType.ValueCondition, "条件", () => ValueCondition, x => ValueCondition = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            StatusHelper.VerifyValueCondition(Title, status, Arguments[1], valueCondition);
+            StatusHelper.VerifyValueCondition(Title, status, Arguments[1], ValueCondition);
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(IList<string> target)
         {
-            if (valueIndex >= target.Count) return valueCondition.Match(string.Empty);
-            return valueCondition.Match(target[valueIndex]);
+            if (ColumnIndex >= target.Count) return ValueCondition.Match(string.Empty);
+            return ValueCondition.Match(target[ColumnIndex]);
         }
     }
 
@@ -354,7 +363,10 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class CheckAllValueRowCondition : RowCondition
     {
-        private ValueCondition valueCondition;
+        /// <summary>
+        /// 値に適用する条件を取得または設定します。
+        /// </summary>
+        public ValueCondition ValueCondition { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "行内の全てのセルが条件を満たす";
@@ -362,13 +374,9 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// <summary>
         /// <see cref="CheckAllValueRowCondition"/>の新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="valueCondition">値に対する条件</param>
-        /// <exception cref="ArgumentNullException"><paramref name="valueCondition"/>が<see langword="null"/></exception>
-        public CheckAllValueRowCondition(ValueCondition valueCondition)
+        public CheckAllValueRowCondition()
         {
-            ArgumentNullException.ThrowIfNull(valueCondition);
-
-            this.valueCondition = valueCondition;
+            ValueCondition = ValueCondition.Null;
         }
 
         /// <summary>
@@ -380,7 +388,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         private CheckAllValueRowCondition(CheckAllValueRowCondition cloned)
             : base(cloned)
         {
-            valueCondition = cloned.valueCondition.Clone();
+            ValueCondition = cloned.ValueCondition.Clone();
         }
 
         /// <inheritdoc/>
@@ -391,14 +399,14 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.ValueCondition, "条件", () => valueCondition, x => valueCondition = x),
+                new ArgumentInfo(ArgumentType.ValueCondition, "条件", () => ValueCondition, x => ValueCondition = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            StatusHelper.VerifyValueCondition(Title, status, Arguments[0], valueCondition);
+            StatusHelper.VerifyValueCondition(Title, status, Arguments[0], ValueCondition);
         }
 
         /// <inheritdoc/>
@@ -406,7 +414,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             foreach (string current in target)
             {
-                MatchResult match = valueCondition.Match(current);
+                MatchResult match = ValueCondition.Match(current);
                 if (match != MatchResult.Matched) return match;
             }
             return MatchResult.Matched;
@@ -419,7 +427,10 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class CheckAnyValueRowCondition : RowCondition
     {
-        private ValueCondition valueCondition;
+        /// <summary>
+        /// 値に適用する条件を取得または設定します。
+        /// </summary>
+        public ValueCondition ValueCondition { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "行内のいずれかのセルが条件を満たす";
@@ -427,13 +438,9 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// <summary>
         /// <see cref="CheckAnyValueRowCondition"/>の新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="valueCondition">値に対する条件</param>
-        /// <exception cref="ArgumentNullException"><paramref name="valueCondition"/>が<see langword="null"/></exception>
-        public CheckAnyValueRowCondition(ValueCondition valueCondition)
+        public CheckAnyValueRowCondition()
         {
-            ArgumentNullException.ThrowIfNull(valueCondition);
-
-            this.valueCondition = valueCondition;
+            ValueCondition = ValueCondition.Null;
         }
 
         /// <summary>
@@ -445,7 +452,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         private CheckAnyValueRowCondition(CheckAnyValueRowCondition cloned)
             : base(cloned)
         {
-            valueCondition = cloned.valueCondition.Clone();
+            ValueCondition = cloned.ValueCondition.Clone();
         }
 
         /// <inheritdoc/>
@@ -456,14 +463,14 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.ValueCondition, "条件", () => valueCondition, x => valueCondition = x),
+                new ArgumentInfo(ArgumentType.ValueCondition, "条件", () => ValueCondition, x => ValueCondition = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            StatusHelper.VerifyValueCondition(Title, status, Arguments[0], valueCondition);
+            StatusHelper.VerifyValueCondition(Title, status, Arguments[0], ValueCondition);
         }
 
         /// <inheritdoc/>
@@ -471,7 +478,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             foreach (string current in target)
             {
-                MatchResult match = valueCondition.Match(current);
+                MatchResult match = ValueCondition.Match(current);
                 if (match != MatchResult.NotMatched) return match;
             }
             return MatchResult.NotMatched;
