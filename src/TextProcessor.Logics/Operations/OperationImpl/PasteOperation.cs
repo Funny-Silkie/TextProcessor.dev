@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using TextProcessor.Logics.Data;
 
 namespace TextProcessor.Logics.Operations.OperationImpl
@@ -11,7 +10,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class PasteOperation : Operation
     {
-        private TextData? target;
+        /// <summary>
+        /// 連結するデータを取得または設定します。
+        /// </summary>
+        public TextData? Target;
 
         /// <inheritdoc/>
         public override string Title => "ファイルを横方向に連結";
@@ -32,7 +34,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected PasteOperation(PasteOperation cloned)
             : base(cloned)
         {
-            target = cloned.target;
+            Target = cloned.Target;
         }
 
         /// <inheritdoc/>
@@ -43,27 +45,27 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.TextData, "ファイル", () => target!, x => target = x),
+                new ArgumentInfo(ArgumentType.TextData, "ファイル", () => Target!, x => Target = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            if (target is null) status.Errors.Add(new StatusEntry(Title, Arguments[0], "連結するファイルが指定されていません"));
+            if (Target is null) status.Errors.Add(new StatusEntry(Title, Arguments[0], "連結するファイルが指定されていません"));
         }
 
         /// <inheritdoc/>
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
-            if (target is null) return;
+            if (Target is null) return;
 
             List<List<string>> dataList = data.GetSourceData();
-            List<List<string>> targetList = target.GetSourceData();
+            List<List<string>> targetList = Target.GetSourceData();
             int pastedOffset = data.ColumnCount;
 
             int dataIndex = data.HasHeader ? 1 : 0;
-            int targetIndex = target.HasHeader ? 1 : 0;
+            int targetIndex = Target.HasHeader ? 1 : 0;
 
             if (targetIndex == 1)
             {

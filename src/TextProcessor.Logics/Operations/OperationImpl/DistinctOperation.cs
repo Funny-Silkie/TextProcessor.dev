@@ -10,9 +10,20 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class DistinctOperation : Operation
     {
-        private bool isAll;
-        private int key;
-        private bool caseSensitive = true;
+        /// <summary>
+        /// 全ての列のデータを検証するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool IsAll { get; set; }
+
+        /// <summary>
+        /// キーの列インデックスを取得または設定します。
+        /// </summary>
+        public int KeyIndex { get; set; }
+
+        /// <summary>
+        /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool CaseSensitive { get; set; } = true;
 
         /// <inheritdoc/>
         public override string Title => "重複を削除";
@@ -33,9 +44,9 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected DistinctOperation(DistinctOperation cloned)
             : base(cloned)
         {
-            isAll = cloned.isAll;
-            key = cloned.key;
-            caseSensitive = cloned.caseSensitive;
+            IsAll = cloned.IsAll;
+            KeyIndex = cloned.KeyIndex;
+            CaseSensitive = cloned.CaseSensitive;
         }
 
         /// <inheritdoc/>
@@ -46,9 +57,9 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Boolean, "全ての列を比較", () => isAll, x => isAll = x),
-                new ArgumentInfo(ArgumentType.Index, "比較する列番号", () => key, x => key = x),
-                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => caseSensitive, x => caseSensitive = x),
+                new ArgumentInfo(ArgumentType.Boolean, "全ての列を比較", () => IsAll, x => IsAll = x),
+                new ArgumentInfo(ArgumentType.Index, "比較する列番号", () => KeyIndex, x => KeyIndex = x),
+                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => CaseSensitive, x => CaseSensitive = x),
             };
         }
 
@@ -61,7 +72,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
             List<List<string>> list = data.GetSourceData();
-            IEqualityComparer<List<string>> comparer = isAll ? new AllValueRowEqualityComparer(!caseSensitive) : new IndexedRowEqualityComparer(!caseSensitive, key);
+            IEqualityComparer<List<string>> comparer = IsAll ? new AllValueRowEqualityComparer(!CaseSensitive) : new IndexedRowEqualityComparer(!CaseSensitive, KeyIndex);
             var set = new HashSet<List<string>>(list.Count, comparer);
             int index = 0;
             int removedCount = 0;

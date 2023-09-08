@@ -46,7 +46,7 @@ namespace TextProcessor.Logics.Operations
         {
             return new Operation[]
             {
-                new FilterRowOperation(RowCondition.Null),
+                new FilterRowOperation(),
                 new HeadOperation(),
                 new TailOperation(),
                 new SkipHeadOperation(),

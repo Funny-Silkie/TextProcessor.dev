@@ -11,7 +11,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class PrependOperation : Operation
     {
-        private TextData? prepended;
+        /// <summary>
+        /// 連結するデータを取得または設定します。
+        /// </summary>
+        public TextData? Prepended { get; set; }
 
         /// <inheritdoc/>
         public override string Title => "ファイルを前に連結";
@@ -32,7 +35,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected PrependOperation(PrependOperation cloned)
             : base(cloned)
         {
-            prepended = cloned.prepended;
+            Prepended = cloned.Prepended;
         }
 
         /// <inheritdoc/>
@@ -43,25 +46,25 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.TextData, "連結するファイル", () => prepended!, x => prepended = x),
+                new ArgumentInfo(ArgumentType.TextData, "連結するファイル", () => Prepended!, x => Prepended = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            if (prepended is null) status.Errors.Add(new StatusEntry(Title, Arguments[0], "連結するファイルが指定されていません"));
+            if (Prepended is null) status.Errors.Add(new StatusEntry(Title, Arguments[0], "連結するファイルが指定されていません"));
         }
 
         /// <inheritdoc/>
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
-            if (prepended is null) return;
+            if (Prepended is null) return;
 
             List<List<string>> dataList = data.GetSourceData();
-            List<List<string>> prependedList = prepended.GetSourceData();
+            List<List<string>> prependedList = Prepended.GetSourceData();
             dataList.EnsureCapacity(dataList.Count + prependedList.Count);
-            int prependedIndex = prepended.HasHeader ? 1 : 0;
+            int prependedIndex = Prepended.HasHeader ? 1 : 0;
             int prependedCount = prependedList.Count - prependedIndex;
             List<string>[] prependedValues = prependedList.Skip(prependedIndex).Take(prependedCount).Select(x => x.ToList()).ToArray();
             dataList.InsertRange(data.HasHeader ? 1 : 0, prependedValues);
