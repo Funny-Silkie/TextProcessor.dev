@@ -55,7 +55,7 @@ namespace TextProcessor.Logics.Operations.Conditions
                 new EndsWithValueCondition(),
                 new RegexMatchValueCondition(),
                 ValueConditionFactory.LargerAsInteger(),
-                ValueConditionFactory.LargetAsDecimal(),
+                ValueConditionFactory.LargerAsDecimal(),
                 ValueConditionFactory.LowerAsInteger(),
                 ValueConditionFactory.LowerAsDecimal(),
                 ValueConditionFactory.LargerOrEqualAsInteger(),
@@ -121,7 +121,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// <see cref="double"/>に対する<see cref="LargerValueCondition{T}"/>のインスタンスを生成します。
         /// </summary>
         /// <returns><see cref="LargerValueCondition{T}"/>の新しいインスタンス</returns>
-        public static LargerValueCondition<double> LargetAsDecimal()
+        public static LargerValueCondition<double> LargerAsDecimal()
         {
             return new LargerValueCondition<double>(ArgumentType.Decimal, "指定した数値より大きい", 0, x => (double.TryParse(x, out double result), result));
         }

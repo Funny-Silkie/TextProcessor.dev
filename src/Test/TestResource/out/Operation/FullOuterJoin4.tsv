@@ -1,0 +1,18 @@
+Id	Region	Name	Capital	Name
+1	1	Hokkaido	Sapporo	Hokkaido
+2	2	Aomori	Aomori	Tohoku
+3	2	Iwate	Morioka	Tohoku
+4	2	Akita	Akita	Tohoku
+7	2	Fukushima	Fukushima	Tohoku
+8	3	Ibaraki	Mito	Kanto
+10	3	Gumma	Maebashi	Kanto
+12	3	Chiba	Chiba	Kanto
+19	5	Aichi	Nagoya	
+20	5	Gifu	Gifu	
+23	6	Ishikawa	Kanazawa	
+24	6	Fukui	Fukui	
+30	7	Hyogo	Kobe	
+33	8	Hiroshima	Hiroshima	
+38	9	Ehime	Matsuyama	
+40	10	Fukuoka	Fukuoka	
+	4			Koshinetsu

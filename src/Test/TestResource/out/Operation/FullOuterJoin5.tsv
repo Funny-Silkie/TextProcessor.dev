@@ -1,0 +1,49 @@
+Name	Age	Address	Id	Region	Name
+Tanaka Taro	29	Tokyo	13	3	Tokyo
+Suzuki Sachiko	41	Osaka	29	7	Osaka
+Sato Chihiro	37	Nagoya	19	5	Aichi
+Tanaka Taro	33	Yokohama	14	3	Kanagawa
+Saito Kenta	13	Saitama	11	3	Saitama
+Goto Momoe	23	Kyoto	26	7	Kyoto
+Suzuki Sachiko	41	osaka	29	7	Osaka
+		Sapporo	1	1	Hokkaido
+		Aomori	2	2	Aomori
+		Morioka	3	2	Iwate
+		Akita	4	2	Akita
+		Sendai	5	2	Miyagi
+		Yamagata	6	2	Yamagata
+		Fukushima	7	2	Fukushima
+		Mito	8	3	Ibaraki
+		Utsunomiya	9	3	Tochigi
+		Maebashi	10	3	Gumma
+		Chiba	12	3	Chiba
+		Kofu	15	4	Yamanashi
+		Nagano	16	4	Nagano
+		Nigata	17	4	Nigata
+		Hamamatsu	18	5	Shizuoka
+		Gifu	20	5	Gifu
+		Tsu	21	5	Mie
+		Toyama	22	6	Toyama
+		Kanazawa	23	6	Ishikawa
+		Fukui	24	6	Fukui
+		Otsu	25	7	Shiga
+		Nara	27	7	Nara
+		Wakayama	28	7	Wakayama
+		Kobe	30	7	Hyogo
+		Okayama	31	8	Okayama
+		Tottori	32	8	Tottori
+		Hiroshima	33	8	Hiroshima
+		Matsue	34	8	Shimane
+		Yamaguchi	35	8	Yamaguchi
+		Takamatsu	36	9	Kagawa
+		Kochi	37	9	Kochi
+		Matsuyama	38	9	Ehime
+		Tokushima	39	9	Tokushima
+		Fukuoka	40	10	Fukuoka
+		Saga	41	10	Saga
+		Nagasaki	42	10	Nagasaki
+		Oita	43	10	Oita
+		Kumamoto	44	10	Kumamoto
+		Miyazaki	45	10	Miyazaki
+		Kagoshima	46	10	Kagoshima
+		Naha	47	11	Okinawa
