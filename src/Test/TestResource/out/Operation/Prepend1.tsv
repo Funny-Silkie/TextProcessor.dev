@@ -1,4 +1,15 @@
 Id	Region	Name	Capital
+1	Hokkaido
+2	Tohoku
+3	Kanto
+4	Koshinetsu
+5	Chubu
+6	Hokuriku
+7	Kinki
+8	Chugoku
+9	Shikoku
+10	Kyushu
+11	Okinawa
 1	1	Hokkaido	Sapporo
 2	2	Aomori	Aomori
 3	2	Iwate	Morioka

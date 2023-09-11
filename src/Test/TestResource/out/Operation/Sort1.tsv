@@ -1,13 +1,5 @@
 Id	Region	Name	Capital
 1	1	Hokkaido	Sapporo
-2	2	Aomori	Aomori
-3	2	Iwate	Morioka
-4	2	Akita	Akita
-5	2	Miyagi	Sendai
-6	2	Yamagata	Yamagata
-7	2	Fukushima	Fukushima
-8	3	Ibaraki	Mito
-9	3	Tochigi	Utsunomiya
 10	3	Gumma	Maebashi
 11	3	Saitama	Saitama
 12	3	Chiba	Chiba
@@ -18,6 +10,7 @@ Id	Region	Name	Capital
 17	4	Nigata	Nigata
 18	5	Shizuoka	Hamamatsu
 19	5	Aichi	Nagoya
+2	2	Aomori	Aomori
 20	5	Gifu	Gifu
 21	5	Mie	Tsu
 22	6	Toyama	Toyama
@@ -28,6 +21,7 @@ Id	Region	Name	Capital
 27	7	Nara	Nara
 28	7	Wakayama	Wakayama
 29	7	Osaka	Osaka
+3	2	Iwate	Morioka
 30	7	Hyogo	Kobe
 31	8	Okayama	Okayama
 32	8	Tottori	Tottori
@@ -38,6 +32,7 @@ Id	Region	Name	Capital
 37	9	Kochi	Kochi
 38	9	Ehime	Matsuyama
 39	9	Tokushima	Tokushima
+4	2	Akita	Akita
 40	10	Fukuoka	Fukuoka
 41	10	Saga	Saga
 42	10	Nagasaki	Nagasaki
@@ -46,3 +41,8 @@ Id	Region	Name	Capital
 45	10	Miyazaki	Miyazaki
 46	10	Kagoshima	Kagoshima
 47	11	Okinawa	Naha
+5	2	Miyagi	Sendai
+6	2	Yamagata	Yamagata
+7	2	Fukushima	Fukushima
+8	3	Ibaraki	Mito
+9	3	Tochigi	Utsunomiya
