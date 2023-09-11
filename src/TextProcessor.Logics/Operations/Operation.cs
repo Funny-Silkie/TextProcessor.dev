@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using TextProcessor.Logics.Data;
-using TextProcessor.Logics.Operations.Conditions;
 using TextProcessor.Logics.Operations.OperationImpl;
 
 namespace TextProcessor.Logics.Operations

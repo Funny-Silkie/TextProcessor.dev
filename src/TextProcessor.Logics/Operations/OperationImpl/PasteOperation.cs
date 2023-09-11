@@ -13,7 +13,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         /// <summary>
         /// 連結するデータを取得または設定します。
         /// </summary>
-        public TextData? Target;
+        public TextData? Target { get; set; }
 
         /// <inheritdoc/>
         public override string Title => "ファイルを横方向に連結";

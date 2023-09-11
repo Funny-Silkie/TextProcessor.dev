@@ -908,13 +908,13 @@ namespace TextProcessor.Logics.Operations.Conditions
             }
         }
 
+        [StringSyntax(StringSyntaxAttribute.Regex)]
+        private string _pattern = string.Empty;
+
         /// <summary>
         /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
         /// </summary>
         public bool CaseSensitive { get; set; } = true;
-
-        [StringSyntax(StringSyntaxAttribute.Regex)]
-        private string _pattern = string.Empty;
 
         /// <summary>
         /// 使用する正規表現オブジェクトを取得します。

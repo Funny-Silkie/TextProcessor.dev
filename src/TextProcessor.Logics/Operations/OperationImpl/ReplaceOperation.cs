@@ -12,9 +12,20 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     internal class ReplaceOperation : Operation
     {
         /// <summary>
-        /// 検索文字列を取得または設定します。s
+        /// 検索文字列を取得または設定します。
         /// </summary>
-        public string QueryText { get; set; } = string.Empty;
+        public string QueryText
+        {
+            get => _queryText;
+            set
+            {
+                if (string.Equals(_queryText, value, StringComparison.Ordinal)) return;
+                _queryText = value;
+                _regex = null;
+            }
+        }
+
+        private string _queryText = string.Empty;
 
         /// <summary>
         /// 置換後の文字列を取得または設定します。
