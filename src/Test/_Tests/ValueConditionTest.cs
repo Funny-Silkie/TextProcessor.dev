@@ -10,6 +10,143 @@ namespace Test
     public class ValueConditionTest
     {
         /// <summary>
+        /// <see cref="NotValueCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Not1()
+        {
+            var condition = new NotValueCondition()
+            {
+                Condition = new IsEmptyValueCondition(),
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Match(""), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("HogeHoge"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("123"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("-123"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("1.4"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("-1e+5"), Is.EqualTo(MatchResult.Matched));
+            });
+        }
+
+        /// <summary>
+        /// <see cref="NotValueCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Not2()
+        {
+            var condition = new NotValueCondition()
+            {
+                Condition = ValueCondition.Null,
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.False);
+        }
+
+        /// <summary>
+        /// <see cref="OrValueCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Or1()
+        {
+            var condition = new OrValueCondition()
+            {
+                Conditions = new ValueCondition[]{
+                    new IsEmptyValueCondition(),
+                    new IsIntegerValueCondition(),
+                },
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Match(""), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("HogeHoge"), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("123"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("-123"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("1.4"), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("-1e+5"), Is.EqualTo(MatchResult.NotMatched));
+            });
+        }
+
+        /// <summary>
+        /// <see cref="OrValueCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Or2()
+        {
+            var condition = new OrValueCondition()
+            {
+                Conditions = new ValueCondition[]{
+                    new IsEmptyValueCondition(),
+                    new IsIntegerValueCondition(),
+                    ValueCondition.Null,
+                },
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.False);
+        }
+
+        /// <summary>
+        /// <see cref="AndValueCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void And1()
+        {
+            var condition = new AndValueCondition()
+            {
+                Conditions = new ValueCondition[]{
+                    new IsIntegerValueCondition(),
+                    new StartsWithValueCondition()
+                    {
+                        Comparison = "-",
+                    },
+                },
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Match(""), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("HogeHoge"), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("123"), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("-123"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("1.4"), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("-1e+5"), Is.EqualTo(MatchResult.NotMatched));
+            });
+        }
+
+        /// <summary>
+        /// <see cref="AndValueCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void And2()
+        {
+            var condition = new AndValueCondition()
+            {
+                Conditions = new ValueCondition[]{
+                    new IsEmptyValueCondition(),
+                    new IsIntegerValueCondition(),
+                    ValueCondition.Null,
+                },
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.False);
+        }
+
+        /// <summary>
         /// <see cref="IsEmptyValueCondition"/>のテストを行います。
         /// </summary>
         [Test]

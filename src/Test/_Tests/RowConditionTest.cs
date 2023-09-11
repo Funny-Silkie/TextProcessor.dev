@@ -11,6 +11,182 @@ namespace Test
     public class RowConditionTest
     {
         /// <summary>
+        /// <see cref="NotRowCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Not1()
+        {
+            var condition = new NotRowCondition()
+            {
+                Condition = new CheckValueRowCondition()
+                {
+                    ColumnIndex = 1,
+                    ValueCondition = new IsEmptyValueCondition(),
+                },
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Match(Array.Empty<string>()), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match(new[] { "", "", "" }), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match(new[] { "", "HogeHoge", "123" }), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match(new[] { "HogeHoge", "123", "" }), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match(new[] { "123", "", "HogeHoge" }), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match(new[] { "+++", "HogeHoge", "123" }), Is.EqualTo(MatchResult.Matched));
+            });
+        }
+
+        /// <summary>
+        /// <see cref="NotRowCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Not2()
+        {
+            var condition = new NotRowCondition()
+            {
+                Condition = RowCondition.Null,
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.False);
+        }
+
+        /// <summary>
+        /// <see cref="OrRowCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Or1()
+        {
+            var condition = new OrRowCondition()
+            {
+                Conditions = new RowCondition[]
+                {
+                    new CheckValueRowCondition()
+                    {
+                        ColumnIndex = 1,
+                        ValueCondition = new IsEmptyValueCondition(),
+                    },
+                    new CheckAnyValueRowCondition()
+                    {
+                        ValueCondition = new MatchValueCondition()
+                        {
+                            Comparison = "+++",
+                        },
+                    },
+                },
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Match(Array.Empty<string>()), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match(new[] { "", "", "" }), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match(new[] { "", "HogeHoge", "123" }), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match(new[] { "HogeHoge", "123", "" }), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match(new[] { "123", "", "HogeHoge" }), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match(new[] { "+++", "HogeHoge", "123" }), Is.EqualTo(MatchResult.Matched));
+            });
+        }
+
+        /// <summary>
+        /// <see cref="OrRowCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Or2()
+        {
+            var condition = new OrRowCondition()
+            {
+                Conditions = new RowCondition[]
+                {
+                    new CheckValueRowCondition()
+                    {
+                        ColumnIndex = 1,
+                        ValueCondition = new IsEmptyValueCondition(),
+                    },
+                    new CheckAnyValueRowCondition()
+                    {
+                        ValueCondition = new MatchValueCondition()
+                        {
+                            Comparison = "+++",
+                        },
+                    },
+                    RowCondition.Null,
+                },
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.False);
+        }
+
+        /// <summary>
+        /// <see cref="AndRowCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void And1()
+        {
+            var condition = new AndRowCondition()
+            {
+                Conditions = new RowCondition[]
+                {
+                    new CheckValueRowCondition()
+                    {
+                        ColumnIndex = 1,
+                        ValueCondition = new IsEmptyValueCondition(),
+                    },
+                    new CheckAnyValueRowCondition()
+                    {
+                        ValueCondition = new IsIntegerValueCondition(),
+                    },
+                },
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Match(Array.Empty<string>()), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match(new[] { "", "", "" }), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match(new[] { "", "HogeHoge", "123" }), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match(new[] { "HogeHoge", "123", "" }), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match(new[] { "123", "", "HogeHoge" }), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match(new[] { "+++", "HogeHoge", "123" }), Is.EqualTo(MatchResult.NotMatched));
+            });
+        }
+
+        /// <summary>
+        /// <see cref="AndRowCondition"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void And2()
+        {
+            var condition = new AndRowCondition()
+            {
+                Conditions = new RowCondition[]
+                {
+                    new CheckValueRowCondition()
+                    {
+                        ColumnIndex = 1,
+                        ValueCondition = new IsEmptyValueCondition(),
+                    },
+                    new CheckAnyValueRowCondition()
+                    {
+                        ValueCondition = new IsIntegerValueCondition(),
+                    },
+                    RowCondition.Null,
+                },
+            };
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.False);
+        }
+
+        /// <summary>
         /// <see cref="CheckValueRowCondition"/>のテストを行います。
         /// </summary>
         [Test]
