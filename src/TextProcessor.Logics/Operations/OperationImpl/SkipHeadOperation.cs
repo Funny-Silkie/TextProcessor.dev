@@ -10,7 +10,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class SkipHeadOperation : Operation
     {
-        private int count = 1;
+        /// <summary>
+        /// スキップする行数を取得または設定します。
+        /// </summary>
+        public int Count { get; set; } = 1;
 
         /// <inheritdoc/>
         public override string Title => "先頭から指定した行数ぶんスキップ";
@@ -31,7 +34,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected SkipHeadOperation(SkipHeadOperation cloned)
             : base(cloned)
         {
-            count = cloned.count;
+            Count = cloned.Count;
         }
 
         /// <inheritdoc/>
@@ -42,21 +45,21 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Integer, "行数", () => count, x => count = x),
+                new ArgumentInfo(ArgumentType.Integer, "行数", () => Count, x => Count = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            if (count < 0) status.Errors.Add(new StatusEntry(Title, Arguments[0], "行数が負の値です"));
+            if (Count < 0) status.Errors.Add(new StatusEntry(Title, Arguments[0], "行数が負の値です"));
         }
 
         /// <inheritdoc/>
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
-            if (count < 0) return;
-            if (count == 0)
+            if (Count < 0) return;
+            if (Count == 0)
             {
                 status.Warnings.Add(new StatusEntry(Title, null, "スキップされた行はありません"));
                 return;
@@ -64,13 +67,13 @@ namespace TextProcessor.Logics.Operations.OperationImpl
 
             List<List<string>> list = data.GetSourceData();
             int startIndex = data.HasHeader ? 1 : 0;
-            if (startIndex + count >= list.Count)
+            if (startIndex + Count >= list.Count)
             {
                 list.RemoveRange(startIndex, list.Count - startIndex);
                 status.Warnings.Add(new StatusEntry(Title, null, "全ての行がスキップされました"));
                 return;
             }
-            list.RemoveRange(startIndex, count);
+            list.RemoveRange(startIndex, Count);
         }
     }
 }

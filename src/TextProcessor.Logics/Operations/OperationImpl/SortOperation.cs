@@ -10,10 +10,25 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class SortOperation : Operation
     {
-        private int key;
-        private bool asNumber;
-        private bool reverse;
-        private bool caseSensitive = true;
+        /// <summary>
+        /// キーの列インデックスを取得または設定します。
+        /// </summary>
+        public int KeyIndex { get; set; }
+
+        /// <summary>
+        /// 数値として比較を行うかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool AsNumber { get; set; }
+
+        /// <summary>
+        /// 逆順ソートを行うかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool AsReversed { get; set; }
+
+        /// <summary>
+        /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool CaseSensitive { get; set; } = true;
 
         /// <inheritdoc/>
         public override string Title => "並び替え";
@@ -34,10 +49,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected SortOperation(SortOperation cloned)
             : base(cloned)
         {
-            key = cloned.key;
-            caseSensitive = cloned.caseSensitive;
-            asNumber = cloned.asNumber;
-            reverse = cloned.reverse;
+            KeyIndex = cloned.KeyIndex;
+            CaseSensitive = cloned.CaseSensitive;
+            AsNumber = cloned.AsNumber;
+            AsReversed = cloned.AsReversed;
         }
 
         /// <inheritdoc/>
@@ -51,10 +66,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Index, "キーの列番号", () => key, x => key = x),
-                new ArgumentInfo(ArgumentType.Boolean, "逆順ソート", () => reverse, x => reverse = x),
-                new ArgumentInfo(ArgumentType.Boolean, "数値として比較", () => asNumber, x => asNumber = x),
-                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => caseSensitive, x => caseSensitive = x),
+                new ArgumentInfo(ArgumentType.Index, "キーの列番号", () => KeyIndex, x => KeyIndex = x),
+                new ArgumentInfo(ArgumentType.Boolean, "逆順ソート", () => AsReversed, x => AsReversed = x),
+                new ArgumentInfo(ArgumentType.Boolean, "数値として比較", () => AsNumber, x => AsNumber = x),
+                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => CaseSensitive, x => CaseSensitive = x),
             };
         }
 
@@ -66,10 +81,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         /// <inheritdoc/>
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
-            IComparer<List<string>> comparer = asNumber ? new IndexedNumberComparer(key) : new IndexedStringComparer(!caseSensitive, key);
+            IComparer<List<string>> comparer = AsNumber ? new IndexedNumberComparer(KeyIndex) : new IndexedStringComparer(!CaseSensitive, KeyIndex);
             List<List<string>> list = data.GetSourceData();
             int offset = data.HasHeader ? 1 : 0;
-            Comparison<List<string>> comparison = reverse ? (x, y) => comparer.Compare(y, x) : comparer.Compare;
+            Comparison<List<string>> comparison = AsReversed ? (x, y) => comparer.Compare(y, x) : comparer.Compare;
             list.Sort(offset, list.Count - offset, Comparer<List<string>>.Create(comparison));
         }
 

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using TextProcessor.Logics.Data;
-using TextProcessor.Logics.Operations.Conditions;
 using TextProcessor.Logics.Operations.OperationImpl;
 
 namespace TextProcessor.Logics.Operations
@@ -46,7 +45,7 @@ namespace TextProcessor.Logics.Operations
         {
             return new Operation[]
             {
-                new FilterRowOperation(RowCondition.Null),
+                new FilterRowOperation(),
                 new HeadOperation(),
                 new TailOperation(),
                 new SkipHeadOperation(),

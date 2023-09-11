@@ -11,11 +11,30 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class InnerJoinOperation : Operation
     {
-        private int keyIndex;
-        private TextData? target;
-        private int targetKeyIndex;
-        private bool caseSensitive = true;
-        private bool removeKey;
+        /// <summary>
+        /// キーの列インデックスを取得または設定します。
+        /// </summary>
+        public int KeyIndex { get; set; }
+
+        /// <summary>
+        /// 結合するデータを取得または設定します。
+        /// </summary>
+        public TextData? Target { get; set; }
+
+        /// <summary>
+        /// <see cref="Target"/>におけるキーの列インデックスを取得または設定します。
+        /// </summary>
+        public int TargetKeyIndex { get; set; }
+
+        /// <summary>
+        /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool CaseSensitive { get; set; } = true;
+
+        /// <summary>
+        /// 結合後キーの列を削除するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool RemoveKey { get; set; }
 
         /// <inheritdoc/>
         public override string Title => "他データと内部結合";
@@ -36,10 +55,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected InnerJoinOperation(InnerJoinOperation cloned)
             : base(cloned)
         {
-            keyIndex = cloned.keyIndex;
-            target = cloned.target;
-            targetKeyIndex = cloned.targetKeyIndex;
-            caseSensitive = cloned.caseSensitive;
+            KeyIndex = cloned.KeyIndex;
+            Target = cloned.Target;
+            TargetKeyIndex = cloned.TargetKeyIndex;
+            CaseSensitive = cloned.CaseSensitive;
         }
 
         /// <inheritdoc/>
@@ -50,38 +69,38 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Index, "キーの列番号", () => keyIndex, x => keyIndex = x),
-                new ArgumentInfo(ArgumentType.TextData, "結合するファイル", () => target!, x => target = x),
-                new ArgumentInfo(ArgumentType.Index, "キーの列番号", () => targetKeyIndex, x => targetKeyIndex = x),
-                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => caseSensitive, x => caseSensitive = x),
-                new ArgumentInfo(ArgumentType.Boolean, "キー列を削除する", () => removeKey, x => removeKey = x),
+                new ArgumentInfo(ArgumentType.Index, "キーの列番号", () => KeyIndex, x => KeyIndex = x),
+                new ArgumentInfo(ArgumentType.TextData, "結合するファイル", () => Target!, x => Target = x),
+                new ArgumentInfo(ArgumentType.Index, "キーの列番号", () => TargetKeyIndex, x => TargetKeyIndex = x),
+                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => CaseSensitive, x => CaseSensitive = x),
+                new ArgumentInfo(ArgumentType.Boolean, "キー列を削除する", () => RemoveKey, x => RemoveKey = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            if (target is null) status.Errors.Add(new StatusEntry(Title, Arguments[1], "結合するファイルが指定されていません"));
+            if (Target is null) status.Errors.Add(new StatusEntry(Title, Arguments[1], "結合するファイルが指定されていません"));
         }
 
         /// <inheritdoc/>
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
-            if (target is null) return;
+            if (Target is null) return;
 
-            IEqualityComparer<string> comparer = caseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+            IEqualityComparer<string> comparer = CaseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
             List<List<string>> dataList = data.GetSourceData();
-            List<List<string>> targetList = target.GetSourceData();
+            List<List<string>> targetList = Target.GetSourceData();
             int startCount = dataList.Count;
             int joinOffset = data.ColumnCount;
             int dataStart = data.HasHeader ? 1 : 0;
-            int targetStart = target.HasHeader ? 1 : 0;
+            int targetStart = Target.HasHeader ? 1 : 0;
 
             if (targetStart == 1)
             {
                 List<string> dataHeader;
                 List<string> targetHeader = targetList[0].ToList();
-                if (targetKeyIndex < targetHeader.Count) targetHeader.RemoveAt(targetKeyIndex);
+                if (TargetKeyIndex < targetHeader.Count) targetHeader.RemoveAt(TargetKeyIndex);
                 if (dataStart == 0)
                 {
                     dataHeader = new List<string>(joinOffset + targetHeader.Count);
@@ -111,15 +130,15 @@ namespace TextProcessor.Logics.Operations.OperationImpl
             }
 
             List<List<string>> resultList = dataList.Skip(dataStart)
-                                                    .Join(targetList.Skip(targetStart), x => keyIndex < x.Count ? x[keyIndex] : string.Empty, x => targetKeyIndex < x.Count ? x[targetKeyIndex] : string.Empty, (x, y) => CombineRow(x, y, joinOffset), comparer)
+                                                    .Join(targetList.Skip(targetStart), x => KeyIndex < x.Count ? x[KeyIndex] : string.Empty, x => TargetKeyIndex < x.Count ? x[TargetKeyIndex] : string.Empty, (x, y) => CombineRow(x, y, joinOffset), comparer)
                                                     .ToList();
             if (data.HasHeader) dataList.RemoveRange(1, dataList.Count - 1);
             else dataList.Clear();
             dataList.AddRange(resultList);
 
-            if (removeKey)
+            if (RemoveKey)
                 for (int rowIndex = 0; rowIndex < dataList.Count; rowIndex++)
-                    dataList[rowIndex].RemoveAt(keyIndex);
+                    dataList[rowIndex].RemoveAt(KeyIndex);
 
             if (startCount > (data.HasHeader ? 1 : 0) && dataList.Count == dataStart) status.Warnings.Add(new StatusEntry(Title, null, "結合できるレコードがありません"));
         }
@@ -135,7 +154,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             List<string> outerList = outer.ToList();
             List<string> innerList = inner.ToList();
-            if (targetKeyIndex < inner.Count) innerList.RemoveAt(targetKeyIndex);
+            if (TargetKeyIndex < inner.Count) innerList.RemoveAt(TargetKeyIndex);
             outerList.EnsureCapacity(outerList.Count + innerList.Count);
             if (outerList.Count < joinOffset)
             {

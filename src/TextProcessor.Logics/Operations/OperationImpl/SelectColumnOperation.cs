@@ -10,7 +10,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class SelectColumnOperation : Operation
     {
-        private int columnIndex;
+        /// <summary>
+        /// 対象の列インデックスを取得または設定します。
+        /// </summary>
+        public int ColumnIndex { get; set; }
 
         /// <inheritdoc/>
         public override string Title => "指定した列を抽出";
@@ -31,7 +34,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected SelectColumnOperation(SelectColumnOperation cloned)
             : base(cloned)
         {
-            columnIndex = cloned.columnIndex;
+            ColumnIndex = cloned.ColumnIndex;
         }
 
         /// <inheritdoc/>
@@ -42,7 +45,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Index, "列番号", () => columnIndex, x => columnIndex = x),
+                new ArgumentInfo(ArgumentType.Index, "列番号", () => ColumnIndex, x => ColumnIndex = x),
             };
         }
 
@@ -59,15 +62,15 @@ namespace TextProcessor.Logics.Operations.OperationImpl
 
             foreach (List<string> row in list)
             {
-                if (columnIndex >= row.Count)
+                if (ColumnIndex >= row.Count)
                 {
                     failCount++;
                     row.Clear();
                     row.Add(string.Empty);
                     continue;
                 }
-                if (columnIndex < row.Count - 1) row.RemoveRange(columnIndex + 1, row.Count - columnIndex - 1);
-                row.RemoveRange(0, columnIndex);
+                if (ColumnIndex < row.Count - 1) row.RemoveRange(ColumnIndex + 1, row.Count - ColumnIndex - 1);
+                row.RemoveRange(0, ColumnIndex);
             }
 
             if (failCount == list.Count) status.Warnings.Add(new StatusEntry(Title, null, "列番号が表の範囲外です"));

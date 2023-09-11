@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace TextProcessor.Logics.Data
         /// <summary>
         /// 先頭行をヘッダーとするかどうかを表す値を取得または設定します。
         /// </summary>
+        [MemberNotNullWhen(true, nameof(Header))]
         public bool HasHeader { get; set; }
 
         /// <summary>
@@ -52,6 +54,33 @@ namespace TextProcessor.Logics.Data
         private TextData(List<List<string>> items)
         {
             this.items = items;
+        }
+
+        /// <summary>
+        /// ファイルを読み込んで<see cref="TextData"/>のインスタンスを生成します。
+        /// </summary>
+        /// <param name="fileName">読み込むファイルパス</param>
+        /// <param name="options">読み込み時のオプション</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"><paramref name="fileName"/>または<paramref name="options"/>が<see langword="null"/></exception>
+        /// <exception cref="ArgumentException"><paramref name="fileName"/>が無効</exception>
+        /// <exception cref="DirectoryNotFoundException"><paramref name="fileName"/>のディレクトリが存在しない</exception>
+        /// <exception cref="FileNotFoundException"><paramref name="fileName"/>が存在しない</exception>
+        /// <exception cref="System.Security.SecurityException">アクセス権限がない</exception>
+        /// <exception cref="IOException">I/Oエラーが発生した</exception>
+        /// <exception cref="OutOfMemoryException">メモリ不足</exception>
+        /// <exception cref="System.Text.RegularExpressions.RegexMatchTimeoutException">正規表現検索時にタイムアウトが発生</exception>
+        public static TextData Create(string fileName, TextLoadOptions options)
+        {
+            using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return Create(stream, options);
+        }
+
+        /// <inheritdoc cref="Create(Stream, TextLoadOptions)"/>
+        public static async Task<TextData> CreateAsync(string fileName, TextLoadOptions options)
+        {
+            using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return await CreateAsync(stream, options);
         }
 
         /// <summary>

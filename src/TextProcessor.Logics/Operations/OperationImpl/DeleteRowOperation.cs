@@ -10,7 +10,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class DeleteRowOperation : Operation
     {
-        private int index;
+        /// <summary>
+        /// 削除する行のインデックスを取得または設定します。
+        /// </summary>
+        public int Index { get; set; }
 
         /// <inheritdoc/>
         public override string Title => "指定した行を削除";
@@ -31,7 +34,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected DeleteRowOperation(DeleteRowOperation cloned)
             : base(cloned)
         {
-            index = cloned.index;
+            Index = cloned.Index;
         }
 
         /// <inheritdoc/>
@@ -42,7 +45,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Index, "行番号", () => index, x => index = x),
+                new ArgumentInfo(ArgumentType.Index, "行番号", () => Index, x => Index = x),
             };
         }
 
@@ -55,10 +58,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
             List<List<string>> list = data.GetSourceData();
-            int deletedIndex = index;
+            int deletedIndex = Index;
             if (data.HasHeader) deletedIndex++;
             if (deletedIndex < list.Count) list.RemoveAt(deletedIndex);
-            else status.Warnings.Add(new StatusEntry(Title, null, $"行番号'{index + 1}'の行は存在しません"));
+            else status.Warnings.Add(new StatusEntry(Title, null, $"行番号'{Index + 1}'の行は存在しません"));
         }
     }
 }

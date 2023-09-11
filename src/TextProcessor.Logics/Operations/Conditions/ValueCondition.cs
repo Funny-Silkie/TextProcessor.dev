@@ -54,16 +54,16 @@ namespace TextProcessor.Logics.Operations.Conditions
                 new StartsWithValueCondition(),
                 new EndsWithValueCondition(),
                 new RegexMatchValueCondition(),
-                new LargerValueCondition<long>(ArgumentType.Integer64, "指定した整数より大きい", 0, x => (long.TryParse(x, out long result), result)),
-                new LargerValueCondition<double>(ArgumentType.Decimal, "指定した数値より大きい", 0, x => (double.TryParse(x, out double result), result)),
-                new LowerValueCondition<long>(ArgumentType.Integer64, "指定した整数より小さい", 0, x => (long.TryParse(x, out long result), result)),
-                new LowerValueCondition<double>(ArgumentType.Decimal, "指定した数値より小さい", 0, x => (double.TryParse(x, out double result), result)),
-                new LargerOrEqualValueCondition<long>(ArgumentType.Integer64, "指定した整数以上", 0, x => (long.TryParse(x, out long result), result)),
-                new LargerOrEqualValueCondition<double>(ArgumentType.Decimal, "指定した数値以上", 0, x => (double.TryParse(x, out double result), result)),
-                new LowerOrEqualValueCondition<long>(ArgumentType.Integer64, "指定した整数以下", 0, x => (long.TryParse(x, out long result), result)),
-                new LowerOrEqualValueCondition<double>(ArgumentType.Decimal, "指定した数値以下", 0, x => (double.TryParse(x, out double result), result)),
-                new EqualValueCondition<long>(ArgumentType.Integer64, "指定した整数と等しい", 0, x => (long.TryParse(x, out long result), result)),
-                new EqualValueCondition<double>(ArgumentType.Decimal, "指定した数値と等しい", 0, x => (double.TryParse(x, out double result), result)),
+                ValueConditionFactory.LargerAsInteger(),
+                ValueConditionFactory.LargetAsDecimal(),
+                ValueConditionFactory.LowerAsInteger(),
+                ValueConditionFactory.LowerAsDecimal(),
+                ValueConditionFactory.LargerOrEqualAsInteger(),
+                ValueConditionFactory.LargerOrEqualAsDecimal(),
+                ValueConditionFactory.LowerOrEqualAsInteger(),
+                ValueConditionFactory.LowerOrEqualAsDecimal(),
+                ValueConditionFactory.EqualAsInteger(),
+                ValueConditionFactory.EqualAsDecimal(),
             };
         }
 
@@ -104,12 +104,111 @@ namespace TextProcessor.Logics.Operations.Conditions
     }
 
     /// <summary>
+    /// <see cref="ValueCondition"/>の生成を行います。
+    /// </summary>
+    internal static class ValueConditionFactory
+    {
+        /// <summary>
+        /// <see cref="long"/>に対する<see cref="LargerValueCondition{T}"/>のインスタンスを生成します。
+        /// </summary>
+        /// <returns><see cref="LargerValueCondition{T}"/>の新しいインスタンス</returns>
+        public static LargerValueCondition<long> LargerAsInteger()
+        {
+            return new LargerValueCondition<long>(ArgumentType.Integer64, "指定した整数より大きい", 0, x => (long.TryParse(x, out long result), result));
+        }
+
+        /// <summary>
+        /// <see cref="double"/>に対する<see cref="LargerValueCondition{T}"/>のインスタンスを生成します。
+        /// </summary>
+        /// <returns><see cref="LargerValueCondition{T}"/>の新しいインスタンス</returns>
+        public static LargerValueCondition<double> LargetAsDecimal()
+        {
+            return new LargerValueCondition<double>(ArgumentType.Decimal, "指定した数値より大きい", 0, x => (double.TryParse(x, out double result), result));
+        }
+
+        /// <summary>
+        /// <see cref="long"/>に対する<see cref="LowerValueCondition{T}"/>のインスタンスを生成します。
+        /// </summary>
+        /// <returns><see cref="LowerValueCondition{T}"/>の新しいインスタンス</returns>
+        public static LowerValueCondition<long> LowerAsInteger()
+        {
+            return new LowerValueCondition<long>(ArgumentType.Integer64, "指定した整数より小さい", 0, x => (long.TryParse(x, out long result), result));
+        }
+
+        /// <summary>
+        /// <see cref="double"/>に対する<see cref="LowerValueCondition{T}"/>のインスタンスを生成します。
+        /// </summary>
+        /// <returns><see cref="LowerValueCondition{T}"/>の新しいインスタンス</returns>
+        public static LowerValueCondition<double> LowerAsDecimal()
+        {
+            return new LowerValueCondition<double>(ArgumentType.Decimal, "指定した数値より小さい", 0, x => (double.TryParse(x, out double result), result));
+        }
+
+        /// <summary>
+        /// <see cref="long"/>に対する<see cref="LargerOrEqualValueCondition{T}"/>のインスタンスを生成します。
+        /// </summary>
+        /// <returns><see cref="LargerValueCondition{T}"/>の新しいインスタンス</returns>
+        public static LargerOrEqualValueCondition<long> LargerOrEqualAsInteger()
+        {
+            return new LargerOrEqualValueCondition<long>(ArgumentType.Integer64, "指定した整数以上", 0, x => (long.TryParse(x, out long result), result));
+        }
+
+        /// <summary>
+        /// <see cref="double"/>に対する<see cref="LargerOrEqualValueCondition{T}"/>のインスタンスを生成します。
+        /// </summary>
+        /// <returns><see cref="LargerValueCondition{T}"/>の新しいインスタンス</returns>
+        public static LargerOrEqualValueCondition<double> LargerOrEqualAsDecimal()
+        {
+            return new LargerOrEqualValueCondition<double>(ArgumentType.Decimal, "指定した数値以上", 0, x => (double.TryParse(x, out double result), result));
+        }
+
+        /// <summary>
+        /// <see cref="long"/>に対する<see cref="LowerOrEqualValueCondition{T}"/>のインスタンスを生成します。
+        /// </summary>
+        /// <returns><see cref="LargerValueCondition{T}"/>の新しいインスタンス</returns>
+        public static LowerOrEqualValueCondition<long> LowerOrEqualAsInteger()
+        {
+            return new LowerOrEqualValueCondition<long>(ArgumentType.Integer64, "指定した整数以下", 0, x => (long.TryParse(x, out long result), result));
+        }
+
+        /// <summary>
+        /// <see cref="double"/>に対する<see cref="LowerOrEqualValueCondition{T}"/>のインスタンスを生成します。
+        /// </summary>
+        /// <returns><see cref="LargerValueCondition{T}"/>の新しいインスタンス</returns>
+        public static LowerOrEqualValueCondition<double> LowerOrEqualAsDecimal()
+        {
+            return new LowerOrEqualValueCondition<double>(ArgumentType.Decimal, "指定した数値以下", 0, x => (double.TryParse(x, out double result), result));
+        }
+
+        /// <summary>
+        /// <see cref="long"/>に対する<see cref="EqualValueCondition{T}"/>のインスタンスを生成します。
+        /// </summary>
+        /// <returns><see cref="LargerValueCondition{T}"/>の新しいインスタンス</returns>
+        public static EqualValueCondition<long> EqualAsInteger()
+        {
+            return new EqualValueCondition<long>(ArgumentType.Integer64, "指定した整数と等しい", 0, x => (long.TryParse(x, out long result), result));
+        }
+
+        /// <summary>
+        /// <see cref="double"/>に対する<see cref="EqualValueCondition{T}"/>のインスタンスを生成します。
+        /// </summary>
+        /// <returns><see cref="LargerValueCondition{T}"/>の新しいインスタンス</returns>
+        public static EqualValueCondition<double> EqualAsDecimal()
+        {
+            return new EqualValueCondition<double>(ArgumentType.Decimal, "指定した数値と等しい", 0, x => (double.TryParse(x, out double result), result));
+        }
+    }
+
+    /// <summary>
     /// NOT条件を表します。
     /// </summary>
     [Serializable]
     internal sealed class NotValueCondition : ValueCondition
     {
-        private ValueCondition condition;
+        /// <summary>
+        /// 反転する条件を取得または設定します。
+        /// </summary>
+        public ValueCondition Condition { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "NOT";
@@ -119,7 +218,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public NotValueCondition()
         {
-            condition = Null;
+            Condition = Null;
         }
 
         /// <summary>
@@ -131,7 +230,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         private NotValueCondition(NotValueCondition cloned)
             : base(cloned)
         {
-            condition = cloned.condition.Clone();
+            Condition = cloned.Condition.Clone();
         }
 
         /// <inheritdoc/>
@@ -142,20 +241,20 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.ValueCondition, "条件", () => condition, x => condition = x),
+                new ArgumentInfo(ArgumentType.ValueCondition, "条件", () => Condition, x => Condition = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            StatusHelper.VerifyValueCondition(Title, status, Arguments[0], condition);
+            StatusHelper.VerifyValueCondition(Title, status, Arguments[0], Condition);
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(string target)
         {
-            MatchResult match = condition.Match(target);
+            MatchResult match = Condition.Match(target);
             return match switch
             {
                 MatchResult.Matched => MatchResult.NotMatched,
@@ -171,7 +270,10 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class AndValueCondition : ValueCondition
     {
-        private ValueCondition[] conditions;
+        /// <summary>
+        /// 対象の条件一覧を取得または設定します。
+        /// </summary>
+        public ValueCondition[] Conditions { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "AND";
@@ -181,8 +283,8 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public AndValueCondition()
         {
-            conditions = new ValueCondition[2];
-            Array.Fill(conditions, Null);
+            Conditions = new ValueCondition[2];
+            Array.Fill(Conditions, Null);
         }
 
         /// <summary>
@@ -194,7 +296,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         private AndValueCondition(AndValueCondition cloned)
             : base(cloned)
         {
-            conditions = cloned.conditions.CloneAll();
+            Conditions = cloned.Conditions.CloneAll();
         }
 
         /// <inheritdoc/>
@@ -205,23 +307,23 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.ValueCondition | ArgumentType.Array, "条件", () => conditions, x => conditions = x),
+                new ArgumentInfo(ArgumentType.ValueCondition | ArgumentType.Array, "条件", () => Conditions, x => Conditions = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            for (int i = 0; i < conditions.Length; i++)
+            for (int i = 0; i < Conditions.Length; i++)
             {
-                StatusHelper.VerifyValueCondition(Title, status, Arguments[0], conditions[i]);
+                StatusHelper.VerifyValueCondition(Title, status, Arguments[0], Conditions[i]);
             }
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(string target)
         {
-            foreach (ValueCondition currentCondition in conditions)
+            foreach (ValueCondition currentCondition in Conditions)
             {
                 MatchResult currentResult = currentCondition.Match(target);
                 if (currentResult != MatchResult.Matched) return currentResult;
@@ -237,7 +339,10 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class OrValueCondition : ValueCondition
     {
-        private ValueCondition[] conditions;
+        /// <summary>
+        /// 対象の条件一覧を取得または設定します。
+        /// </summary>
+        public ValueCondition[] Conditions { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "OR";
@@ -247,8 +352,8 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public OrValueCondition()
         {
-            conditions = new ValueCondition[2];
-            Array.Fill(conditions, Null);
+            Conditions = new ValueCondition[2];
+            Array.Fill(Conditions, Null);
         }
 
         /// <summary>
@@ -260,7 +365,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         private OrValueCondition(OrValueCondition cloned)
             : base(cloned)
         {
-            conditions = cloned.conditions.CloneAll();
+            Conditions = cloned.Conditions.CloneAll();
         }
 
         /// <inheritdoc/>
@@ -271,23 +376,23 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.ValueCondition | ArgumentType.Array, "条件", () => conditions, x => conditions = x),
+                new ArgumentInfo(ArgumentType.ValueCondition | ArgumentType.Array, "条件", () => Conditions, x => Conditions = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            for (int i = 0; i < conditions.Length; i++)
+            for (int i = 0; i < Conditions.Length; i++)
             {
-                StatusHelper.VerifyValueCondition(Title, status, Arguments[0], conditions[i]);
+                StatusHelper.VerifyValueCondition(Title, status, Arguments[0], Conditions[i]);
             }
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(string target)
         {
-            foreach (ValueCondition currentCondition in conditions)
+            foreach (ValueCondition currentCondition in Conditions)
             {
                 MatchResult currentResult = currentCondition.Match(target);
                 if (currentResult != MatchResult.NotMatched) return currentResult;
@@ -344,9 +449,13 @@ namespace TextProcessor.Logics.Operations.Conditions
     internal sealed class LargerValueCondition<T> : ValueCondition
         where T : IComparable<T>
     {
-        private T comparison;
         private readonly Func<string, (bool success, T valueT)> converter;
         private readonly ArgumentType type;
+
+        /// <summary>
+        /// 比較対象の値を取得または設定します。
+        /// </summary>
+        public T Comparison { get; set; }
 
         /// <inheritdoc/>
         public override string? Title { get; }
@@ -366,7 +475,7 @@ namespace TextProcessor.Logics.Operations.Conditions
             if (!Enum.IsDefined(type)) throw new ArgumentOutOfRangeException(nameof(type));
 
             this.type = type;
-            this.comparison = comparison;
+            this.Comparison = comparison;
             this.converter = converter;
             Title = title;
         }
@@ -376,7 +485,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(type, "値", () => comparison, x => comparison = x),
+                new ArgumentInfo(type, "値", () => Comparison, x => Comparison = x),
             };
         }
 
@@ -385,7 +494,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             (bool success, T valueT) = converter.Invoke(target);
             if (!success) return MatchResult.Error;
-            return valueT.CompareTo(comparison) > 0 ? MatchResult.Matched : MatchResult.NotMatched;
+            return valueT.CompareTo(Comparison) > 0 ? MatchResult.Matched : MatchResult.NotMatched;
         }
     }
 
@@ -397,9 +506,13 @@ namespace TextProcessor.Logics.Operations.Conditions
     internal sealed class LowerValueCondition<T> : ValueCondition
         where T : IComparable<T>
     {
-        private T comparison;
         private readonly Func<string, (bool success, T valueT)> converter;
         private readonly ArgumentType type;
+
+        /// <summary>
+        /// 比較対象の値を取得または設定します。
+        /// </summary>
+        public T Comparison { get; set; }
 
         /// <inheritdoc/>
         public override string? Title { get; }
@@ -419,7 +532,7 @@ namespace TextProcessor.Logics.Operations.Conditions
             if (!Enum.IsDefined(type)) throw new ArgumentOutOfRangeException(nameof(type));
 
             this.type = type;
-            this.comparison = comparison;
+            this.Comparison = comparison;
             this.converter = converter;
             Title = title;
         }
@@ -429,7 +542,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(type, "値", () => comparison, x => comparison = x),
+                new ArgumentInfo(type, "値", () => Comparison, x => Comparison = x),
             };
         }
 
@@ -438,7 +551,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             (bool success, T valueT) = converter.Invoke(target);
             if (!success) return MatchResult.Error;
-            return valueT.CompareTo(comparison) < 0 ? MatchResult.Matched : MatchResult.NotMatched;
+            return valueT.CompareTo(Comparison) < 0 ? MatchResult.Matched : MatchResult.NotMatched;
         }
     }
 
@@ -450,9 +563,13 @@ namespace TextProcessor.Logics.Operations.Conditions
     internal sealed class LargerOrEqualValueCondition<T> : ValueCondition
         where T : IComparable<T>
     {
-        private T comparison;
         private readonly Func<string, (bool success, T valueT)> converter;
         private readonly ArgumentType type;
+
+        /// <summary>
+        /// 比較対象の値を取得または設定します。
+        /// </summary>
+        public T Comparison { get; set; }
 
         /// <inheritdoc/>
         public override string? Title { get; }
@@ -472,7 +589,7 @@ namespace TextProcessor.Logics.Operations.Conditions
             if (!Enum.IsDefined(type)) throw new ArgumentOutOfRangeException(nameof(type));
 
             this.type = type;
-            this.comparison = comparison;
+            this.Comparison = comparison;
             this.converter = converter;
             Title = title;
         }
@@ -482,7 +599,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(type, "値", () => comparison, x => comparison = x),
+                new ArgumentInfo(type, "値", () => Comparison, x => Comparison = x),
             };
         }
 
@@ -491,7 +608,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             (bool success, T valueT) = converter.Invoke(target);
             if (!success) return MatchResult.Error;
-            return valueT.CompareTo(comparison) >= 0 ? MatchResult.Matched : MatchResult.NotMatched;
+            return valueT.CompareTo(Comparison) >= 0 ? MatchResult.Matched : MatchResult.NotMatched;
         }
     }
 
@@ -503,9 +620,13 @@ namespace TextProcessor.Logics.Operations.Conditions
     internal sealed class LowerOrEqualValueCondition<T> : ValueCondition
         where T : IComparable<T>
     {
-        private T comparison;
         private readonly Func<string, (bool success, T valueT)> converter;
         private readonly ArgumentType type;
+
+        /// <summary>
+        /// 比較対象の値を取得または設定します。
+        /// </summary>
+        public T Comparison { get; set; }
 
         /// <inheritdoc/>
         public override string? Title { get; }
@@ -525,7 +646,7 @@ namespace TextProcessor.Logics.Operations.Conditions
             if (!Enum.IsDefined(type)) throw new ArgumentOutOfRangeException(nameof(type));
 
             this.type = type;
-            this.comparison = comparison;
+            this.Comparison = comparison;
             this.converter = converter;
             Title = title;
         }
@@ -535,7 +656,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(type, "値", () => comparison, x => comparison = x),
+                new ArgumentInfo(type, "値", () => Comparison, x => Comparison = x),
             };
         }
 
@@ -544,7 +665,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             (bool success, T valueT) = converter.Invoke(target);
             if (!success) return MatchResult.Error;
-            return valueT.CompareTo(comparison) <= 0 ? MatchResult.Matched : MatchResult.NotMatched;
+            return valueT.CompareTo(Comparison) <= 0 ? MatchResult.Matched : MatchResult.NotMatched;
         }
     }
 
@@ -556,9 +677,13 @@ namespace TextProcessor.Logics.Operations.Conditions
     internal sealed class EqualValueCondition<T> : ValueCondition
         where T : IEquatable<T>
     {
-        private T comparison;
         private readonly Func<string, (bool success, T valueT)> converter;
         private readonly ArgumentType type;
+
+        /// <summary>
+        /// 比較対象の値を取得または設定します。
+        /// </summary>
+        public T Comparison { get; set; }
 
         /// <inheritdoc/>
         public override string? Title { get; }
@@ -577,7 +702,7 @@ namespace TextProcessor.Logics.Operations.Conditions
             if (!Enum.IsDefined(type)) throw new ArgumentOutOfRangeException(nameof(type));
 
             this.type = type;
-            this.comparison = comparison;
+            this.Comparison = comparison;
             this.converter = converter;
             Title = title;
         }
@@ -587,7 +712,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(type, "値", () => comparison, x => comparison = x),
+                new ArgumentInfo(type, "値", () => Comparison, x => Comparison = x),
             };
         }
 
@@ -596,7 +721,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             (bool success, T valueT) = converter.Invoke(target);
             if (!success) return MatchResult.Error;
-            return valueT.Equals(comparison) ? MatchResult.Matched : MatchResult.NotMatched;
+            return valueT.Equals(Comparison) ? MatchResult.Matched : MatchResult.NotMatched;
         }
     }
 
@@ -606,8 +731,15 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class StartsWithValueCondition : ValueCondition
     {
-        private string comparison = string.Empty;
-        private bool caseSensitive = true;
+        /// <summary>
+        /// 検索文字列を取得または設定します。
+        /// </summary>
+        public string Comparison { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool CaseSensitive { get; set; } = true;
 
         /// <inheritdoc/>
         public override string? Title => "指定した文字列で始まる";
@@ -617,21 +749,21 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.String, "検索文字列", () => comparison, x => comparison = x),
-                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => caseSensitive, x => caseSensitive = x),
+                new ArgumentInfo(ArgumentType.String, "検索文字列", () => Comparison, x => Comparison = x),
+                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => CaseSensitive, x => CaseSensitive = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            if (string.IsNullOrEmpty(comparison)) status.Errors.Add(new StatusEntry(Title, Arguments[0], "検索文字列が指定されていません"));
+            if (string.IsNullOrEmpty(Comparison)) status.Errors.Add(new StatusEntry(Title, Arguments[0], "検索文字列が指定されていません"));
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(string target)
         {
-            return target.StartsWith(comparison, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) ? MatchResult.Matched : MatchResult.NotMatched;
+            return target.StartsWith(Comparison, CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) ? MatchResult.Matched : MatchResult.NotMatched;
         }
     }
 
@@ -641,8 +773,15 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class EndsWithValueCondition : ValueCondition
     {
-        private string comparison = string.Empty;
-        private bool caseSensitive = true;
+        /// <summary>
+        /// 検索文字列を取得または設定します。
+        /// </summary>
+        public string Comparison { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool CaseSensitive { get; set; } = true;
 
         /// <inheritdoc/>
         public override string? Title => "指定した文字列で終わる";
@@ -652,21 +791,21 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.String, "検索文字列", () => comparison, x => comparison = x),
-                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => caseSensitive, x => caseSensitive = x),
+                new ArgumentInfo(ArgumentType.String, "検索文字列", () => Comparison, x => Comparison = x),
+                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => CaseSensitive, x => CaseSensitive = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            if (string.IsNullOrEmpty(comparison)) status.Errors.Add(new StatusEntry(Title, Arguments[0], "検索文字列が指定されていません"));
+            if (string.IsNullOrEmpty(Comparison)) status.Errors.Add(new StatusEntry(Title, Arguments[0], "検索文字列が指定されていません"));
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(string target)
         {
-            return target.EndsWith(comparison, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) ? MatchResult.Matched : MatchResult.NotMatched;
+            return target.EndsWith(Comparison, CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) ? MatchResult.Matched : MatchResult.NotMatched;
         }
     }
 
@@ -676,8 +815,15 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class ContainsValueCondition : ValueCondition
     {
-        private string comparison = string.Empty;
-        private bool caseSensitive = true;
+        /// <summary>
+        /// 検索文字列を取得または設定します。
+        /// </summary>
+        public string Comparison { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool CaseSensitive { get; set; } = true;
 
         /// <inheritdoc/>
         public override string? Title => "指定した文字列を含む";
@@ -687,21 +833,21 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.String, "検索文字列", () => comparison, x => comparison = x),
-                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => caseSensitive, x => caseSensitive = x),
+                new ArgumentInfo(ArgumentType.String, "検索文字列", () => Comparison, x => Comparison = x),
+                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => CaseSensitive, x => CaseSensitive = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            if (string.IsNullOrEmpty(comparison)) status.Errors.Add(new StatusEntry(Title, Arguments[0], "検索文字列が指定されていません"));
+            if (string.IsNullOrEmpty(Comparison)) status.Errors.Add(new StatusEntry(Title, Arguments[0], "検索文字列が指定されていません"));
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(string target)
         {
-            return target.Contains(comparison, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) ? MatchResult.Matched : MatchResult.NotMatched;
+            return target.Contains(Comparison, CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) ? MatchResult.Matched : MatchResult.NotMatched;
         }
     }
 
@@ -711,8 +857,15 @@ namespace TextProcessor.Logics.Operations.Conditions
     [Serializable]
     internal sealed class MatchValueCondition : ValueCondition
     {
-        private string comparison = string.Empty;
-        private bool caseSensitive = true;
+        /// <summary>
+        /// 検索文字列を取得または設定します。
+        /// </summary>
+        public string Comparison { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool CaseSensitive { get; set; } = true;
 
         /// <inheritdoc/>
         public override string? Title => "指定した文字列と一致";
@@ -722,15 +875,15 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.String, "文字列", () => comparison, x => comparison = x),
-                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => caseSensitive, x => caseSensitive = x),
+                new ArgumentInfo(ArgumentType.String, "文字列", () => Comparison, x => Comparison = x),
+                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => CaseSensitive, x => CaseSensitive = x),
             };
         }
 
         /// <inheritdoc/>
         public override MatchResult Match(string target)
         {
-            return string.Equals(target, comparison, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) ? MatchResult.Matched : MatchResult.NotMatched;
+            return string.Equals(target, Comparison, CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase) ? MatchResult.Matched : MatchResult.NotMatched;
         }
     }
 
@@ -744,7 +897,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// 正規表現パターンを取得または設定します。
         /// </summary>
         [StringSyntax(StringSyntaxAttribute.Regex)]
-        private string Pattern
+        public string Pattern
         {
             get => _pattern;
             set
@@ -758,7 +911,10 @@ namespace TextProcessor.Logics.Operations.Conditions
         [StringSyntax(StringSyntaxAttribute.Regex)]
         private string _pattern = string.Empty;
 
-        private bool caseSensitive = true;
+        /// <summary>
+        /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool CaseSensitive { get; set; } = true;
 
         /// <summary>
         /// 使用する正規表現オブジェクトを取得します。
@@ -770,7 +926,7 @@ namespace TextProcessor.Logics.Operations.Conditions
                 if (_regex is null)
                 {
                     var options = RegexOptions.Compiled;
-                    if (!caseSensitive) options |= RegexOptions.IgnoreCase;
+                    if (!CaseSensitive) options |= RegexOptions.IgnoreCase;
                     try
                     {
                         _regex = new Regex(Pattern, options);
@@ -796,7 +952,7 @@ namespace TextProcessor.Logics.Operations.Conditions
             return new[]
             {
                 new ArgumentInfo(ArgumentType.String, "正規表現パターン", () => Pattern, x => Pattern = x),
-                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => caseSensitive, x => caseSensitive = x),
+                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => CaseSensitive, x => CaseSensitive = x),
             };
         }
 

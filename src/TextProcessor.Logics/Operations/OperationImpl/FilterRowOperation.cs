@@ -22,13 +22,9 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         /// <summary>
         /// <see cref="FilterRowOperation"/>の新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="condition">行における条件</param>
-        /// <exception cref="ArgumentNullException"><paramref name="condition"/>が<see langword="null"/></exception>
-        public FilterRowOperation(RowCondition condition)
+        public FilterRowOperation()
         {
-            ArgumentNullException.ThrowIfNull(condition);
-
-            Condition = condition;
+            Condition = RowCondition.Null;
         }
 
         /// <summary>

@@ -11,12 +11,46 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class ReplaceOperation : Operation
     {
-        private string queryText = string.Empty;
-        private string replacerText = string.Empty;
-        private int targetColumn;
-        private bool isAll;
-        private bool caseSensitive = true;
-        private bool useRegex;
+        /// <summary>
+        /// 検索文字列を取得または設定します。
+        /// </summary>
+        public string QueryText
+        {
+            get => _queryText;
+            set
+            {
+                if (string.Equals(_queryText, value, StringComparison.Ordinal)) return;
+                _queryText = value;
+                _regex = null;
+            }
+        }
+
+        private string _queryText = string.Empty;
+
+        /// <summary>
+        /// 置換後の文字列を取得または設定します。
+        /// </summary>
+        public string ReplacerText { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 処理対象の列インデックスを取得または設定します。
+        /// </summary>
+        public int TargetColumnIndex { get; set; }
+
+        /// <summary>
+        /// 全ての列のデータを検証するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool IsAll { get; set; }
+
+        /// <summary>
+        /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool CaseSensitive { get; set; } = true;
+
+        /// <summary>
+        /// 正規表現を使用するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool UseRegex { get; set; }
 
         /// <summary>
         /// 使用する正規表現オブジェクトを取得します。
@@ -25,14 +59,14 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             get
             {
-                if (!useRegex) return null;
+                if (!UseRegex) return null;
                 if (_regex is null)
                 {
                     var options = RegexOptions.Compiled;
-                    if (!caseSensitive) options |= RegexOptions.IgnoreCase;
+                    if (!CaseSensitive) options |= RegexOptions.IgnoreCase;
                     try
                     {
-                        _regex = new Regex(queryText, options);
+                        _regex = new Regex(QueryText, options);
                     }
                     catch
                     {
@@ -65,12 +99,12 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         private ReplaceOperation(ReplaceOperation cloned)
             : base(cloned)
         {
-            queryText = cloned.queryText;
-            replacerText = cloned.replacerText;
-            targetColumn = cloned.targetColumn;
-            isAll = cloned.isAll;
-            caseSensitive = cloned.caseSensitive;
-            useRegex = cloned.useRegex;
+            QueryText = cloned.QueryText;
+            ReplacerText = cloned.ReplacerText;
+            TargetColumnIndex = cloned.TargetColumnIndex;
+            IsAll = cloned.IsAll;
+            CaseSensitive = cloned.CaseSensitive;
+            UseRegex = cloned.UseRegex;
         }
 
         /// <inheritdoc/>
@@ -81,31 +115,31 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.String, "置換前", () => queryText, x => queryText = x),
-                new ArgumentInfo(ArgumentType.String, "置換後", () => replacerText, x => replacerText = x),
-                new ArgumentInfo(ArgumentType.Index, "対象列番号", () => targetColumn, x => targetColumn = x),
-                new ArgumentInfo(ArgumentType.Boolean, "全体を対象にする", () => isAll, x => isAll = x),
-                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => caseSensitive, x => caseSensitive = x),
-                new ArgumentInfo(ArgumentType.Boolean, "正規表現を使用", () => useRegex, x => useRegex = x),
+                new ArgumentInfo(ArgumentType.String, "置換前", () => QueryText, x => QueryText = x),
+                new ArgumentInfo(ArgumentType.String, "置換後", () => ReplacerText, x => ReplacerText = x),
+                new ArgumentInfo(ArgumentType.Index, "対象列番号", () => TargetColumnIndex, x => TargetColumnIndex = x),
+                new ArgumentInfo(ArgumentType.Boolean, "全体を対象にする", () => IsAll, x => IsAll = x),
+                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => CaseSensitive, x => CaseSensitive = x),
+                new ArgumentInfo(ArgumentType.Boolean, "正規表現を使用", () => UseRegex, x => UseRegex = x),
             };
         }
 
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            if (string.IsNullOrEmpty(queryText)) status.Errors.Add(new StatusEntry(Title, Arguments[0], "検索文字列が指定されていません"));
-            if (useRegex && Regex is null) status.Errors.Add(new StatusEntry(Title, Arguments[0], "正規表現が無効です"));
+            if (string.IsNullOrEmpty(QueryText)) status.Errors.Add(new StatusEntry(Title, Arguments[0], "検索文字列が指定されていません"));
+            if (UseRegex && Regex is null) status.Errors.Add(new StatusEntry(Title, Arguments[0], "正規表現が無効です"));
         }
 
         /// <inheritdoc/>
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
             List<List<string>> list = data.GetSourceData();
-            if (useRegex)
+            if (UseRegex)
             {
                 Regex? regex = Regex;
                 if (regex is null) return;
 
-                if (isAll)
+                if (IsAll)
                 {
                     for (int rowIndex = data.HasHeader ? 1 : 0; rowIndex < list.Count; rowIndex++)
                     {
@@ -114,7 +148,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
                         {
                             string value = row[columnIndex];
                             if (string.IsNullOrEmpty(value)) continue;
-                            row[columnIndex] = regex.Replace(value, replacerText);
+                            row[columnIndex] = regex.Replace(value, ReplacerText);
                         }
                     }
                 }
@@ -123,19 +157,19 @@ namespace TextProcessor.Logics.Operations.OperationImpl
                     for (int rowIndex = data.HasHeader ? 1 : 0; rowIndex < list.Count; rowIndex++)
                     {
                         List<string> row = list[rowIndex];
-                        if (targetColumn >= row.Count) continue;
+                        if (TargetColumnIndex >= row.Count) continue;
 
-                        string value = row[targetColumn];
+                        string value = row[TargetColumnIndex];
                         if (string.IsNullOrEmpty(value)) continue;
-                        row[targetColumn] = regex.Replace(value, replacerText);
+                        row[TargetColumnIndex] = regex.Replace(value, ReplacerText);
                     }
                 }
             }
             else
             {
-                StringComparison stringComparison = caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                StringComparison stringComparison = CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
 
-                if (isAll)
+                if (IsAll)
                 {
                     for (int rowIndex = data.HasHeader ? 1 : 0; rowIndex < list.Count; rowIndex++)
                     {
@@ -144,7 +178,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
                         {
                             string value = row[columnIndex];
                             if (string.IsNullOrEmpty(value)) continue;
-                            row[columnIndex] = value.Replace(queryText, replacerText, stringComparison);
+                            row[columnIndex] = value.Replace(QueryText, ReplacerText, stringComparison);
                         }
                     }
                 }
@@ -153,11 +187,11 @@ namespace TextProcessor.Logics.Operations.OperationImpl
                     for (int rowIndex = data.HasHeader ? 1 : 0; rowIndex < list.Count; rowIndex++)
                     {
                         List<string> row = list[rowIndex];
-                        if (targetColumn >= row.Count) continue;
+                        if (TargetColumnIndex >= row.Count) continue;
 
-                        string value = row[targetColumn];
+                        string value = row[TargetColumnIndex];
                         if (string.IsNullOrEmpty(value)) continue;
-                        row[targetColumn] = value.Replace(queryText, replacerText, stringComparison);
+                        row[TargetColumnIndex] = value.Replace(QueryText, ReplacerText, stringComparison);
                     }
                 }
             }

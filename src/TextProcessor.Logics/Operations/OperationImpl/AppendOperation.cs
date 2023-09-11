@@ -11,7 +11,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class AppendOperation : Operation
     {
-        private TextData? appended;
+        /// <summary>
+        /// 連結するデータを取得または設定します。
+        /// </summary>
+        public TextData? Appended { get; set; }
 
         /// <inheritdoc/>
         public override string Title => "ファイルを後ろに連結";
@@ -32,7 +35,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected AppendOperation(AppendOperation cloned)
             : base(cloned)
         {
-            appended = cloned.appended;
+            Appended = cloned.Appended;
         }
 
         /// <inheritdoc/>
@@ -43,25 +46,25 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.TextData, "連結するファイル", () => appended!, x => appended = x),
+                new ArgumentInfo(ArgumentType.TextData, "連結するファイル", () => Appended!, x => Appended = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            if (appended is null) status.Errors.Add(new StatusEntry(Title, Arguments[0], "連結するファイルが指定されていません"));
+            if (Appended is null) status.Errors.Add(new StatusEntry(Title, Arguments[0], "連結するファイルが指定されていません"));
         }
 
         /// <inheritdoc/>
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
-            if (appended is null) return;
+            if (Appended is null) return;
 
             List<List<string>> dataList = data.GetSourceData();
-            List<List<string>> appendedList = appended.GetSourceData();
+            List<List<string>> appendedList = Appended.GetSourceData();
             dataList.EnsureCapacity(dataList.Count + appendedList.Count);
-            int appendedIndex = appended.HasHeader ? 1 : 0;
+            int appendedIndex = Appended.HasHeader ? 1 : 0;
             int appendedCount = appendedList.Count - appendedIndex;
             for (int i = appendedIndex; i < appendedIndex + appendedCount; i++) dataList.Add(appendedList[i].ToList());
         }

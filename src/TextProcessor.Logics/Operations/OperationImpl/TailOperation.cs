@@ -10,7 +10,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class TailOperation : Operation
     {
-        private int count = 1;
+        /// <summary>
+        /// 切り出す行数を取得または設定します。
+        /// </summary>
+        public int Count { get; set; } = 1;
 
         /// <inheritdoc/>
         public override string Title => "末尾から指定した行数ぶん取得";
@@ -31,7 +34,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected TailOperation(TailOperation cloned)
             : base(cloned)
         {
-            count = cloned.count;
+            Count = cloned.Count;
         }
 
         /// <inheritdoc/>
@@ -42,26 +45,26 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Integer, "行数", () => count, x => count = x),
+                new ArgumentInfo(ArgumentType.Integer, "行数", () => Count, x => Count = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            if (count < 0) status.Errors.Add(new StatusEntry(Title, Arguments[0], "行数が負の値です"));
+            if (Count < 0) status.Errors.Add(new StatusEntry(Title, Arguments[0], "行数が負の値です"));
         }
 
         /// <inheritdoc/>
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
-            if (count < 0) return;
+            if (Count < 0) return;
 
             List<List<string>> list = data.GetSourceData();
 
             int offset = data.HasHeader ? 1 : 0;
-            if (count + offset >= list.Count) return;
-            list.RemoveRange(offset, list.Count - count - offset);
+            if (Count + offset >= list.Count) return;
+            list.RemoveRange(offset, list.Count - Count - offset);
         }
     }
 }

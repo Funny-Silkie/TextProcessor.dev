@@ -10,7 +10,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class HeadOperation : Operation
     {
-        private int count = 1;
+        /// <summary>
+        /// 切り出す行数を取得または設定します。
+        /// </summary>
+        public int Count { get; set; } = 1;
 
         /// <inheritdoc/>
         public override string Title => "先頭から指定した行数ぶん取得";
@@ -31,7 +34,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected HeadOperation(HeadOperation cloned)
             : base(cloned)
         {
-            count = cloned.count;
+            Count = cloned.Count;
         }
 
         /// <inheritdoc/>
@@ -42,23 +45,23 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Integer, "行数", () => count, x => count = x),
+                new ArgumentInfo(ArgumentType.Integer, "行数", () => Count, x => Count = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            if (count < 0) status.Errors.Add(new StatusEntry(Title, Arguments[0], "行数が負の値です"));
+            if (Count < 0) status.Errors.Add(new StatusEntry(Title, Arguments[0], "行数が負の値です"));
         }
 
         /// <inheritdoc/>
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
-            if (count < 0) return;
+            if (Count < 0) return;
 
             List<List<string>> list = data.GetSourceData();
-            int actualCount = count;
+            int actualCount = Count;
             if (data.HasHeader) actualCount++;
 
             if (actualCount >= list.Count) return;

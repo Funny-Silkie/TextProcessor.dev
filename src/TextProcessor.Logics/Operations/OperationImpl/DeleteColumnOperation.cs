@@ -10,7 +10,10 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     [Serializable]
     internal class DeleteColumnOperation : Operation
     {
-        private int index;
+        /// <summary>
+        /// 削除する列のインデックスを取得または設定します。
+        /// </summary>
+        public int Index { get; set; }
 
         /// <inheritdoc/>
         public override string Title => "指定した列を削除";
@@ -31,7 +34,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected DeleteColumnOperation(DeleteColumnOperation cloned)
             : base(cloned)
         {
-            index = cloned.index;
+            Index = cloned.Index;
         }
 
         /// <inheritdoc/>
@@ -42,7 +45,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Index, "列番号", () => index, x => index = x),
+                new ArgumentInfo(ArgumentType.Index, "列番号", () => Index, x => Index = x),
             };
         }
 
@@ -57,12 +60,12 @@ namespace TextProcessor.Logics.Operations.OperationImpl
             int removedCount = 0;
 
             foreach (List<string> row in data.GetSourceData())
-                if (index < row.Count)
+                if (Index < row.Count)
                 {
-                    row.RemoveAt(index);
+                    row.RemoveAt(Index);
                     removedCount++;
                 }
-            if (removedCount == 0) status.Warnings.Add(new StatusEntry(Title, null, $"列番号'{index + 1}'の列が存在しません"));
+            if (removedCount == 0) status.Warnings.Add(new StatusEntry(Title, null, $"列番号'{Index + 1}'の列が存在しません"));
         }
     }
 }
