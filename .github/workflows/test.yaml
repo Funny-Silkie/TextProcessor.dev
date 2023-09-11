@@ -1,0 +1,23 @@
+name: 'Execute Test'
+
+on:
+  push:
+    branches: [ master ]
+    tags:
+      - '*'
+  pull_request:
+
+jobs:
+  test:
+    runs-on: 'ubuntu-22.04'
+    steps:
+      - name: checkout project
+        uses: actions/checkout@v4
+      - name: installing .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+      - name: build
+        run: dotnet build -c Debug src/TextProcessor.sln
+      - name: test
+        run: dotnet test src/TextProcessor.sln
