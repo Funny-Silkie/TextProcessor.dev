@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TextProcessor.Logics.Operations;
 using TextProcessor.Logics.Operations.Conditions;
 
@@ -62,7 +63,7 @@ namespace Test
         {
             var condition = new OrRowCondition()
             {
-                Conditions = new RowCondition[]
+                Conditions = new List<RowCondition>()
                 {
                     new CheckValueRowCondition()
                     {
@@ -101,7 +102,7 @@ namespace Test
         {
             var condition = new OrRowCondition()
             {
-                Conditions = new RowCondition[]
+                Conditions = new List<RowCondition>()
                 {
                     new CheckValueRowCondition()
                     {
@@ -131,7 +132,7 @@ namespace Test
         {
             var condition = new AndRowCondition()
             {
-                Conditions = new RowCondition[]
+                Conditions = new List<RowCondition>()
                 {
                     new CheckValueRowCondition()
                     {
@@ -167,7 +168,7 @@ namespace Test
         {
             var condition = new AndRowCondition()
             {
-                Conditions = new RowCondition[]
+                Conditions = new List<RowCondition>()
                 {
                     new CheckValueRowCondition()
                     {

@@ -273,7 +273,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// <summary>
         /// 対象の条件一覧を取得または設定します。
         /// </summary>
-        public ValueCondition[] Conditions { get; set; }
+        public List<ValueCondition> Conditions { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "AND";
@@ -283,8 +283,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public AndValueCondition()
         {
-            Conditions = new ValueCondition[2];
-            Array.Fill(Conditions, Null);
+            Conditions = new List<ValueCondition> { Null, Null };
         }
 
         /// <summary>
@@ -307,14 +306,14 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.ValueCondition | ArgumentType.Array, "条件", () => Conditions, x => Conditions = x),
+                new ArgumentInfo(ArgumentType.ValueCondition | ArgumentType.List, "条件", () => Conditions, x => Conditions = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            for (int i = 0; i < Conditions.Length; i++)
+            for (int i = 0; i < Conditions.Count; i++)
             {
                 StatusHelper.VerifyValueCondition(Title, status, Arguments[0], Conditions[i]);
             }
@@ -342,7 +341,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// <summary>
         /// 対象の条件一覧を取得または設定します。
         /// </summary>
-        public ValueCondition[] Conditions { get; set; }
+        public List<ValueCondition> Conditions { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "OR";
@@ -352,8 +351,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public OrValueCondition()
         {
-            Conditions = new ValueCondition[2];
-            Array.Fill(Conditions, Null);
+            Conditions = new List<ValueCondition> { Null, Null };
         }
 
         /// <summary>
@@ -376,14 +374,14 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.ValueCondition | ArgumentType.Array, "条件", () => Conditions, x => Conditions = x),
+                new ArgumentInfo(ArgumentType.ValueCondition | ArgumentType.List, "条件", () => Conditions, x => Conditions = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            for (int i = 0; i < Conditions.Length; i++)
+            for (int i = 0; i < Conditions.Count; i++)
             {
                 StatusHelper.VerifyValueCondition(Title, status, Arguments[0], Conditions[i]);
             }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace TextProcessor.Logics.Operations.Conditions
@@ -160,7 +160,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// <summary>
         /// 対象の条件一覧を取得または設定します。
         /// </summary>
-        public RowCondition[] Conditions { get; set; }
+        public List<RowCondition> Conditions { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "AND";
@@ -170,8 +170,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public AndRowCondition()
         {
-            Conditions = new RowCondition[2];
-            Array.Fill(Conditions, Null);
+            Conditions = new List<RowCondition>() { Null, Null };
         }
 
         /// <summary>
@@ -194,14 +193,14 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.RowCondition | ArgumentType.Array, "条件", () => Conditions, x => Conditions = x),
+                new ArgumentInfo(ArgumentType.RowCondition | ArgumentType.List, "条件", () => Conditions, x => Conditions = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            for (int i = 0; i < Conditions.Length; i++)
+            for (int i = 0; i < Conditions.Count; i++)
             {
                 StatusHelper.VerifyRowCondition(Title, status, Arguments[0], Conditions[i]);
             }
@@ -229,7 +228,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// <summary>
         /// 対象の条件一覧を取得または設定します。
         /// </summary>
-        public RowCondition[] Conditions { get; set; }
+        public List<RowCondition> Conditions { get; set; }
 
         /// <inheritdoc/>
         public override string? Title => "OR";
@@ -239,8 +238,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// </summary>
         public OrRowCondition()
         {
-            Conditions = new RowCondition[2];
-            Array.Fill(Conditions, Null);
+            Conditions = new List<RowCondition>() { Null, Null };
         }
 
         /// <summary>
@@ -263,14 +261,14 @@ namespace TextProcessor.Logics.Operations.Conditions
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.RowCondition | ArgumentType.Array, "条件", () => Conditions, x => Conditions = x),
+                new ArgumentInfo(ArgumentType.RowCondition | ArgumentType.List, "条件", () => Conditions, x => Conditions = x),
             };
         }
 
         /// <inheritdoc/>
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
-            for (int i = 0; i < Conditions.Length; i++)
+            for (int i = 0; i < Conditions.Count; i++)
             {
                 StatusHelper.VerifyRowCondition(Title, status, Arguments[0], Conditions[i]);
             }

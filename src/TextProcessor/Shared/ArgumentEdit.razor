@@ -22,6 +22,17 @@
                 <ArgumentEditEntry ViewModel="ViewModel" Name="@($"{i + 1}:")" ComponentName="@($"Arg_{Argument.Name}_{i}")" ValueType="type" Getter="() => array.GetValue(index)" Setter="x => array.SetValue(x, index)" />
             }
         }
+        else if (Argument.Type.HasFlag(ArgumentType.List))
+        {
+            if (!string.IsNullOrEmpty(Argument.Name))
+            {
+                <div>
+                    <RadzenLabel Text="@(Argument.Name)" />
+                </div>
+            }
+            IList list = Argument.Getter.Invoke();
+            <ArgumentListEdit Source="list" Argument="Argument" ViewModel="ViewModel" />
+        }
         else
         {
             <ArgumentEditEntry ViewModel="ViewModel" Name="@(Argument.Name)" ComponentName="@($"Arg_{Argument.Name}")" ValueType="Argument.Type" Getter="Argument.Getter" Setter="Argument.Setter" />
