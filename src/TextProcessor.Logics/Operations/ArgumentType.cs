@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace TextProcessor.Logics.Operations
 {
@@ -68,5 +68,10 @@ namespace TextProcessor.Logics.Operations
         /// 固定長配列（<see cref="System.Array"/>）
         /// </summary>
         Array = 1 << 11,
+
+        /// <summary>
+        /// 可変長配列（<see cref="System.Collections.IList"/>）
+        /// </summary>
+        List = 1 << 12,
     }
 }

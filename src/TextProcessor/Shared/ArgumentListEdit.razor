@@ -1,0 +1,71 @@
+﻿@using System.Collections;
+@using TextProcessor.Logics.Operations;
+
+@if (Source is not null && Argument is not null)
+{
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenStack Orientation="Orientation.Horizontal">
+            <RadzenButton Icon="add" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" Click="Append" />
+            <RadzenButton Icon="delete" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Text" Click="Clear" />
+        </RadzenStack>
+        @{
+            ArgumentType type = Argument.Type ^ ArgumentType.List;
+            for (int i = 0; i < Source.Count; i++)
+            {
+                int index = i;
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Stretch">
+                    <ArgumentEditEntry ViewModel="ViewModel" Name="@($"{index + 1}:")" ComponentName="@($"Arg_{Argument.Name}_{i}")" ValueType="type" Getter="() => Source[index]" Setter="x => Source[index] = x" />
+                    <RadzenButton Icon="clear" Size="ButtonSize.ExtraSmall" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" Click="x => Delete(index)" />
+                </RadzenStack>
+            }
+        }
+    </RadzenStack>
+}
+
+@code {
+    /// <summary>
+    /// 対象のリストを取得または設定します。
+    /// </summary>
+    [Parameter]
+    public IList? Source { get; set; }
+
+    /// <summary>
+    /// 対象引数情報を取得または設定します。
+    /// </summary>
+    [Parameter]
+    public ArgumentInfo? Argument { get; set; }
+
+    /// <summary>
+    /// 使用するViewModelのインスタンスを取得または設定します。
+    /// </summary>
+    [Parameter]
+    public ArgumentEditViewModel? ViewModel { get; set; }
+
+    /// <summary>
+    /// 末尾に空の要素を追加します。
+    /// </summary>
+    private async Task Append()
+    {
+        if (Source is null || Argument is null) return;
+        await InvokeAsync(() => Source.Add(ArgumentInfo.GetDefaultValue(Argument.Type)));
+    }
+
+    /// <summary>
+    /// 全要素を削除します。
+    /// </summary>
+    private async Task Clear()
+    {
+        if (Source is null || Argument is null) return;
+        await InvokeAsync(Source.Clear);
+    }
+
+    /// <summary>
+    /// 指定したインデックスの要素を削除します。
+    /// </summary>
+    /// <param name="index">削除する要素のインデックス</param>
+    private async Task Delete(int index)
+    {
+        if (Source is null || Argument is null) return;
+        await InvokeAsync(() => Source.RemoveAt(index));
+    }
+}

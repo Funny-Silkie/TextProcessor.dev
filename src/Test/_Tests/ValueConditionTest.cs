@@ -1,4 +1,5 @@
-﻿using TextProcessor.Logics.Operations;
+﻿using System.Collections.Generic;
+using TextProcessor.Logics.Operations;
 using TextProcessor.Logics.Operations.Conditions;
 
 namespace Test
@@ -57,7 +58,8 @@ namespace Test
         {
             var condition = new OrValueCondition()
             {
-                Conditions = new ValueCondition[]{
+                Conditions = new List<ValueCondition>()
+                {
                     new IsEmptyValueCondition(),
                     new IsIntegerValueCondition(),
                 },
@@ -85,7 +87,8 @@ namespace Test
         {
             var condition = new OrValueCondition()
             {
-                Conditions = new ValueCondition[]{
+                Conditions = new List<ValueCondition>()
+                {
                     new IsEmptyValueCondition(),
                     new IsIntegerValueCondition(),
                     ValueCondition.Null,
@@ -104,7 +107,8 @@ namespace Test
         {
             var condition = new AndValueCondition()
             {
-                Conditions = new ValueCondition[]{
+                Conditions = new List<ValueCondition>()
+                {
                     new IsIntegerValueCondition(),
                     new StartsWithValueCondition()
                     {
@@ -135,7 +139,8 @@ namespace Test
         {
             var condition = new AndValueCondition()
             {
-                Conditions = new ValueCondition[]{
+                Conditions = new List<ValueCondition>()
+                {
                     new IsEmptyValueCondition(),
                     new IsIntegerValueCondition(),
                     ValueCondition.Null,

@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using TextProcessor.Logics.Operations.Conditions;
 
 namespace TextProcessor.Logics.Operations
 {
@@ -27,6 +28,11 @@ namespace TextProcessor.Logics.Operations
         /// 固定長配列を表すかどうかを取得します。
         /// </summary>
         public bool IsArray => Type.HasFlag(ArgumentType.Array);
+
+        /// <summary>
+        /// 可変長配列を表すかどうかを取得します。
+        /// </summary>
+        public bool IsList => Type.HasFlag(ArgumentType.List);
 
         /// <summary>
         /// 引数名を取得します。
@@ -69,6 +75,30 @@ namespace TextProcessor.Logics.Operations
             Name = name;
             Getter = gettter;
             Setter = setter;
+        }
+
+        /// <summary>
+        /// <see cref="ArgumentType"/>に対応した既定値を取得します。
+        /// </summary>
+        /// <param name="type">データ型</param>
+        /// <returns><paramref name="type"/>に対応する既定値</returns>
+        /// <exception cref="NotSupportedException"><paramref name="type"/>が無効</exception>
+        public static object? GetDefaultValue(ArgumentType type)
+        {
+            type &= (~ArgumentType.Array) & (~ArgumentType.List);
+            return type switch
+            {
+                ArgumentType.String or ArgumentType.StringMultiLine => string.Empty,
+                ArgumentType.Integer => 0,
+                ArgumentType.Integer64 => 0L,
+                ArgumentType.Decimal => 0m,
+                ArgumentType.Index => 0,
+                ArgumentType.Boolean => false,
+                ArgumentType.ValueCondition => ValueCondition.Null,
+                ArgumentType.RowCondition => RowCondition.Null,
+                ArgumentType.TextData => null,
+                _ => throw new NotSupportedException(),
+            };
         }
     }
 }
