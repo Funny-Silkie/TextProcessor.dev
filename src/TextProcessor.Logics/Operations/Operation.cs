@@ -82,7 +82,7 @@ namespace TextProcessor.Logics.Operations
         /// <summary>
         /// <inheritdoc cref="IHasArguments.VerifyArguments"/>
         /// </summary>
-        /// <param name="errors">エラーの登録先</param>
+        /// <param name="status">チェック結果</param>
         protected abstract void VerifyArgumentsCore(ProcessStatus status);
 
         /// <inheritdoc cref="ICloneable.Clone"/>

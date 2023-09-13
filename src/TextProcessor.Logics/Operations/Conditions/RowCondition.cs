@@ -61,7 +61,7 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// <summary>
         /// <inheritdoc cref="IHasArguments.VerifyArguments"/>
         /// </summary>
-        /// <param name="errors">エラーの登録先</param>
+        /// <param name="errors">チェック結果</param>
         protected virtual void VerifyArgumentsCore(ProcessStatus status)
         {
         }
