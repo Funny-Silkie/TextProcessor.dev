@@ -1,4 +1,4 @@
-﻿using TextProcessor.Logics.Operations.Conditions;
+using TextProcessor.Logics.Operations.Conditions;
 
 namespace TextProcessor.Logics.Operations
 {
@@ -17,7 +17,11 @@ namespace TextProcessor.Logics.Operations
         public static void VerifyValueCondition(string? parentName, ProcessStatus status, ArgumentInfo arg, ValueCondition target)
         {
             if (target.Equals(ValueCondition.Null)) status.Errors.Add(new StatusEntry(parentName, arg, "値の条件を設定してください"));
-            foreach (StatusEntry entry in target.VerifyArguments().Errors) status.Errors.Add(entry.CreateAsChildren(parentName));
+
+            ProcessStatus verificationResult = target.VerifyArguments();
+            foreach (StatusEntry entry in verificationResult.Errors) status.Errors.Add(entry.CreateAsChildren(parentName));
+            foreach (StatusEntry entry in verificationResult.Warnings) status.Warnings.Add(entry.CreateAsChildren(parentName));
+            foreach (StatusEntry entry in verificationResult.Messages) status.Messages.Add(entry.CreateAsChildren(parentName));
         }
 
         /// <summary>
@@ -30,7 +34,11 @@ namespace TextProcessor.Logics.Operations
         public static void VerifyRowCondition(string? parentName, ProcessStatus status, ArgumentInfo arg, RowCondition target)
         {
             if (target.Equals(RowCondition.Null)) status.Errors.Add(new StatusEntry(parentName, arg, "行の条件を設定してください"));
-            foreach (StatusEntry entry in target.VerifyArguments().Errors) status.Errors.Add(entry.CreateAsChildren(parentName));
+
+            ProcessStatus verificationResult = target.VerifyArguments();
+            foreach (StatusEntry entry in verificationResult.Errors) status.Errors.Add(entry.CreateAsChildren(parentName));
+            foreach (StatusEntry entry in verificationResult.Warnings) status.Warnings.Add(entry.CreateAsChildren(parentName));
+            foreach (StatusEntry entry in verificationResult.Messages) status.Messages.Add(entry.CreateAsChildren(parentName));
         }
     }
 }

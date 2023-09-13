@@ -121,11 +121,8 @@ namespace TextProcessor.ViewModels
             List<ProcessStatus> verificationResults = EditingFile.Value.Operations.ConvertAll(x => x.VerifyArguments());
             editModel.LogList.ClearOnScheduler();
             if (Operations.Count == 0) editModel.LogList.AddOnScheduler(new LogInfo(LogType.Info, "処理が記述されていません", string.Empty));
-            if (verificationResults.Exists(x => !x.Success))
-            {
-                OutputStatus(verificationResults);
-                return null;
-            }
+            OutputStatus(verificationResults);
+            if (verificationResults.Exists(x => !x.Success)) return null;
 
             TextData result = EditingFile.Value.Data.Clone();
 
