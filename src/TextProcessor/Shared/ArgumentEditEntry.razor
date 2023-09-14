@@ -1,5 +1,6 @@
 ﻿@using TextProcessor.Logics.Operations
 @using TextProcessor.Logics.Operations.Conditions
+@using TextProcessor.Logics.Operations.Conversions;
 
 <RadzenLabel Component="@(ComponentName)" Text="@(Name)" />
 @switch (ValueType)
@@ -43,6 +44,9 @@
         break;
     case ArgumentType.TextData:
         <RadzenDropDown TValue="DsvFileInfo" Name="@(ComponentName)" Data="ViewModel.Files" Value="@(ViewModel.Files.FirstOrDefault(x => x.Data == Getter.Invoke()))" ValueChanged="x => Setter.Invoke(x.Data)" TextProperty="Name" />
+        break;
+    case ArgumentType.ValueConversion:
+        <ConditionEdit TValue="ValueConversion" Name="@(ComponentName)" Value="@(Getter.Invoke())" ValueChanged="x => Setter.Invoke(x)" />
         break;
 }
 @code {

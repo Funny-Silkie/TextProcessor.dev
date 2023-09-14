@@ -1,5 +1,6 @@
 ﻿using System;
 using TextProcessor.Logics.Operations.Conditions;
+using TextProcessor.Logics.Operations.Conversions;
 
 namespace TextProcessor.Logics.Operations
 {
@@ -97,6 +98,7 @@ namespace TextProcessor.Logics.Operations
                 ArgumentType.ValueCondition => ValueCondition.Null,
                 ArgumentType.RowCondition => RowCondition.Null,
                 ArgumentType.TextData => null,
+                ArgumentType.ValueConversion => ValueConversion.Through,
                 _ => throw new NotSupportedException(),
             };
         }
