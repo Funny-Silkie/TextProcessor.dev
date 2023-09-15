@@ -163,6 +163,41 @@ namespace Test
         }
 
         /// <summary>
+        /// <see cref="InsertValueConversion"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Insert1()
+        {
+            var conversion = new InsertValueConversion()
+            {
+                Value = "Hoge",
+                Position = 1,
+            };
+
+            ProcessStatus argResult = conversion.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            VerifyResult(conversion, "", null);
+            VerifyResult(conversion, "Hoge", "HHogeoge");
+            VerifyResult(conversion, "123", "1Hoge23");
+        }
+
+        /// <summary>
+        /// <see cref="InsertValueConversion"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Insert2()
+        {
+            var conversion = new InsertValueConversion()
+            {
+                Position = -1,
+            };
+
+            ProcessStatus argResult = conversion.VerifyArguments();
+            Assert.That(argResult.Success, Is.False);
+        }
+
+        /// <summary>
         /// <see cref="OverwriteValueConversion"/>のテストを行います。
         /// </summary>
         [Test]
@@ -179,6 +214,41 @@ namespace Test
             VerifyResult(conversion, "", conversion.Value);
             VerifyResult(conversion, "Hoge", conversion.Value);
             VerifyResult(conversion, "123", conversion.Value);
+        }
+
+        /// <summary>
+        /// <see cref="RangeValueConversion"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Range1()
+        {
+            var conversion = new RangeValueConversion()
+            {
+                StartIndex = 1,
+                Length = 2,
+            };
+
+            ProcessStatus argResult = conversion.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            VerifyResult(conversion, "", "");
+            VerifyResult(conversion, "Hoge", "og");
+            VerifyResult(conversion, "12345", "23");
+        }
+
+        /// <summary>
+        /// <see cref="RangeValueConversion"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void Range2()
+        {
+            var conversion = new RangeValueConversion()
+            {
+                StartIndex = -1,
+            };
+
+            ProcessStatus argResult = conversion.VerifyArguments();
+            Assert.That(argResult.Success, Is.False);
         }
 
         /// <summary>
