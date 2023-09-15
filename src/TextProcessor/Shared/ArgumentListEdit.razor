@@ -47,7 +47,7 @@
     private async Task Append()
     {
         if (Source is null || Argument is null) return;
-        await InvokeAsync(() => Source.Add(ArgumentInfo.GetDefaultValue(Argument.Type)));
+        await InvokeAsync(() => Source.Add(Argument.GetDefaultValue()));
     }
 
     /// <summary>
