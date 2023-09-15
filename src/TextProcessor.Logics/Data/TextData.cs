@@ -116,6 +116,7 @@ namespace TextProcessor.Logics.Data
                 result.items.Add(values);
             }
 
+            result.FillBlanks();
             return result;
         }
 
@@ -141,6 +142,7 @@ namespace TextProcessor.Logics.Data
                 result.items.Add(values);
             }
 
+            result.FillBlanks();
             return result;
         }
 
@@ -174,6 +176,29 @@ namespace TextProcessor.Logics.Data
         }
 
         object ICloneable.Clone() => Clone();
+
+        /// <summary>
+        /// 空文字を挿入して列数を揃えます。
+        /// </summary>
+        public void FillBlanks()
+        {
+            if (RowCount > 0) return;
+            int columnCount = ColumnCount;
+            foreach (List<string> row in items)
+            {
+                if (row.Count >= columnCount) continue;
+
+                if (columnCount - row.Count == 1)
+                {
+                    row.Add(string.Empty);
+                    continue;
+                }
+                var array = new string[columnCount - row.Count];
+
+                Array.Fill(array, string.Empty);
+                row.AddRange(array);
+            }
+        }
 
         /// <summary>
         /// <see cref="items"/>を取得します。
