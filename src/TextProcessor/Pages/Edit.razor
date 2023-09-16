@@ -4,7 +4,7 @@
 
 <RadzenStack>
     <div>
-        <RadzenDropDown Name="DropDown_SelectedFile" TValue="DsvFileInfo" Data="ViewModel.Files" @bind-Value="ViewModel.EditingFile.Value" TextProperty="Name" />
+        <RadzenDropDown Name="DropDown_SelectedFile" TValue="DsvFileInfo" Data="ViewModel.Files" Change="async x => await InvokeAsync(dsvView.RequestRender)" @bind-Value="ViewModel.EditingFile.Value" TextProperty="Name" />
         <RadzenLabel Component="DropDown_SelectedFile" Text="編集するファイル" />
     </div>
     <RadzenSplitter Style="width: calc(100vw - 320px)" Collapse="UpdateLogCollapsed" Expand="UpdateLogCollapsed">
@@ -14,7 +14,7 @@
                 <RadzenStack Style="padding: 1rem" Orientation="Orientation.Horizontal" Gap="1rem">
                     <RadzenButton Text="追加" ButtonStyle="ButtonStyle.Primary" Disabled="ViewModel.EditingFile.Value is null" Click="OpenAddOperationDialog" />
                     <RadzenButton Text="処理実行" ButtonStyle="ButtonStyle.Success" IsBusy="isInOpeartionProgress" Disabled="ViewModel.EditingFile.Value is null" Click="ExecuteOperation" />
-                    <RadzenButton Text="処理スキップ" ButtonStyle="ButtonStyle.Light" Disabled="ViewModel.EditingFile.Value is null" Click="ViewModel.AsRawCommand.ToAsyncDelegate()" />
+                    <RadzenButton Text="処理スキップ" ButtonStyle="ButtonStyle.Light" Disabled="ViewModel.EditingFile.Value is null" Click="AsRaw" />
                     <RadzenButton Icon="file_download" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" IsBusy="isInOpeartionProgress" Disabled="ViewModel.EditingFile.Value is null" Click="StartDownload" />
                 </RadzenStack>
             </RadzenStack>
@@ -22,7 +22,7 @@
         <RadzenSplitterPane Size="calc(100% - 800px)">
             @if (ViewModel.ViewData.Value is not null)
             {
-                <DsvView Style="max-height: calc(100vh - 75px)" Data="ViewModel.ViewData.Value" />
+                <DsvView @ref="dsvView" Style="max-height: calc(100vh - 75px)" Data="ViewModel.ViewData.Value" />
             }
             else if (ViewModel.Files.Count > 0)
             {
@@ -40,6 +40,7 @@
 </RadzenStack>
 
 @code {
+    private DsvView dsvView = default!;
     private bool isInOpeartionProgress;
     private RadzenSplitterPane? logSplitterPane;
 
@@ -66,8 +67,16 @@
     private async Task ExecuteOperation()
     {
         isInOpeartionProgress = true;
+        TextData? prevData = ViewModel.ViewData.Value;
         await ViewModel.OperateCommand.ExecuteAsync();
         isInOpeartionProgress = false;
+        if (ViewModel.ViewData.Value != prevData) await InvokeAsync(dsvView.RequestRender);
+    }
+
+    private async Task AsRaw()
+    {
+        await ViewModel.AsRawCommand.ExecuteAsync();   
+        await InvokeAsync(dsvView.RequestRender);
     }
 
     private async Task StartDownload()

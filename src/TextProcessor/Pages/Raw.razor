@@ -4,17 +4,19 @@
 
 <div>
     <RadzenLabel Component="DropDown_FileName" Text="表示するファイル名" />
-    <RadzenDropDown TValue="DsvFileInfo" Name="DropDown_FileName" Data="ViewModel.Files" @bind-Value="ViewModel.SelectedData.Value" TextProperty="Name" />
+    <RadzenDropDown TValue="DsvFileInfo" Name="DropDown_FileName" Data="ViewModel.Files" Change="OnSelectionChanged" @bind-Value="ViewModel.SelectedData.Value" TextProperty="Name" />
 </div>
 
 @if (ViewModel.SelectedData.Value is not null)
 {
     <div>
-        <DsvView Data="ViewModel.SelectedData.Value.Data" />
+        <DsvView @ref="dsvView" Data="ViewModel.SelectedData.Value.Data" />
     </div>
 }
 
 @code {
+    private DsvView dsvView = default!;
+
     [Parameter]
     public string? Index { get; set; }
 
@@ -27,5 +29,10 @@
         {
             ViewModel.SelectedData.Value = ViewModel.Files[index];
         }
+    }
+
+    private async Task OnSelectionChanged()
+    {
+        await InvokeAsync(dsvView.RequestRender);
     }
 }
