@@ -301,15 +301,14 @@ namespace TextProcessor.Logics.Data
         }
 
         /// <summary>
-        /// ファイルを出力します。
+        /// DSVファイルを出力します。
         /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="options"></param>
+        /// <param name="writer">出力先</param>
+        /// <param name="options">出力オプション</param>
         /// <exception cref="ArgumentNullException"><paramref name="writer"/>または<paramref name="options"/>が<see langword="null"/></exception>
-        /// <exception cref="ArgumentException"><paramref name="writer"/>が空文字</exception>
         /// <exception cref="ObjectDisposedException"><paramref name="writer"/>が既に破棄されている</exception>
         /// <exception cref="IOException">I/Oエラーが発生した</exception>
-        public void WriteTo(TextWriter writer, TextSaveOptions options)
+        public void SaveAsDsv(TextWriter writer, TextSaveOptions options)
         {
             ArgumentNullException.ThrowIfNull(writer);
             ArgumentNullException.ThrowIfNull(options);
@@ -318,15 +317,7 @@ namespace TextProcessor.Logics.Data
             foreach (List<string> row in items) logic.WriteRow(writer, row, "\t");
         }
 
-        /// <summary>
-        /// ファイルを出力します。
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="options"></param>
-        /// <exception cref="ArgumentNullException"><paramref name="writer"/>または<paramref name="options"/>が<see langword="null"/></exception>
-        /// <exception cref="ArgumentException"><paramref name="writer"/>が空文字</exception>
-        /// <exception cref="ObjectDisposedException"><paramref name="writer"/>が既に破棄されている</exception>
-        /// <exception cref="IOException">I/Oエラーが発生した</exception>
+        /// <inheritdoc cref="SaveAsDsv(TextWriter, TextSaveOptions)"/>
         public async Task WriteToAsync(TextWriter writer, TextSaveOptions options)
         {
             ArgumentNullException.ThrowIfNull(writer);
@@ -334,6 +325,55 @@ namespace TextProcessor.Logics.Data
 
             var logic = new DsvLogic();
             foreach (List<string> row in items) await logic.WriteRowAsync(writer, row, "\t");
+        }
+
+        /// <summary>
+        /// Excelのファイルを出力します。
+        /// </summary>
+        /// <param name="stream">出力先</param>
+        /// <param name="sheetName">ワークシート名</param>
+        /// <param name="options">保存時のオプション</param>
+        /// <exception cref="ArgumentNullException"><paramref name="stream"/>または<paramref name="options"/>が<see langword="null"/></exception>
+        /// <exception cref="ObjectDisposedException"><paramref name="stream"/>が既に破棄されている</exception>
+        /// <exception cref="IOException">I/Oエラーが発生した</exception>
+        public void SaveAsExcel(Stream stream, string? sheetName, ExcelSaveOptions options)
+        {
+            ArgumentNullException.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(options);
+
+            using var workBook = new XLWorkbook();
+            IXLWorksheet workSheet = string.IsNullOrEmpty(sheetName) ? workBook.AddWorksheet() : workBook.AddWorksheet(sheetName);
+            for (int rowIndex = 0; rowIndex < items.Count; rowIndex++)
+            {
+                List<string> listRow = items[rowIndex];
+                IXLRow excelRow = workSheet.Row(rowIndex + 1);
+                for (int columnIndex = 0; columnIndex < listRow.Count; columnIndex++)
+                {
+                    string value = listRow[columnIndex];
+                    IXLCell cell = excelRow.Cell(columnIndex + 1);
+                    if (string.IsNullOrEmpty(value)) cell.SetValue(Blank.Value);
+                    else
+                    {
+                        if (options.SaveAsRawString) cell.SetValue(value);
+                        else cell.SetValue(CreateCellValue(value));
+                    }
+                }
+            }
+
+            workBook.SaveAs(stream, new SaveOptions());
+
+            static XLCellValue CreateCellValue(string value)
+            {
+                if (long.TryParse(value, out long vl)) return vl;
+                if (double.TryParse(value, out double vd))
+                {
+                    if (double.IsNaN(vd) || double.IsInfinity(vd)) return value;
+                    return vd;
+                }
+                if (DateTime.TryParse(value, out DateTime vdt)) return vdt;
+                if (TimeSpan.TryParse(value, out TimeSpan vts)) return vts;
+                return value;
+            }
         }
     }
 }

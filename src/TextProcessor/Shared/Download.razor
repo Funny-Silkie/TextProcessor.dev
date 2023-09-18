@@ -1,0 +1,70 @@
+﻿@inject DownloadViewModel ViewModel
+
+<RadzenStack>
+    <RadzenLabel Component="RadioButton_FileType" Text="ファイルの種類" />
+    <RadzenRadioButtonList Name="RadioButton_FileType" TValue="TableFileType" @bind-Value="ViewModel.FileType.Value">
+        <Items>
+            <RadzenRadioButtonListItem Value="TableFileType.Dsv" Text="CSV/TSV" />
+            <RadzenRadioButtonListItem Value="TableFileType.Excel" Text="Excel" />
+        </Items>
+    </RadzenRadioButtonList>
+    @if (ViewModel.IsDsvSelected.Value)
+    {
+        <RadzenText Text="CSV/TSVダウンロードメニュー" />
+        <div>
+            <RadzenLabel Component="RadioButtonList_Delimiter" Text="行区切り文字" />
+            <RadzenRadioButtonList Name="RadioButtonList_Delimiter" TValue="RowDelimiter" @bind-Value="ViewModel.Delimiter.Value">
+                <Items>
+                    <RadzenRadioButtonListItem Text="タブ文字" Value="@(RowDelimiter.Tab)" />
+                    <RadzenRadioButtonListItem Text="カンマ" Value="@(RowDelimiter.Comma)" />
+                    <RadzenRadioButtonListItem Text="その他" Value="@(RowDelimiter.Others)" />
+                </Items>
+            </RadzenRadioButtonList>
+        </div>
+        if (ViewModel.IsOtherDelimiter.Value)
+        {
+            <div>
+                <RadzenTextBox Name="TextBox_OtherDelimiter" @bind-Value="ViewModel.OtherDelimiter.Value" />
+                <RadzenLabel Component="TextBox_OtherDelimiter" Text="その他行区切り文字" />
+            </div>
+        }
+        <div>
+            <RadzenDropDown TValue="string" Name="Dropdown_Encoding" Data="ViewModel.EncodingNames" @bind-Value="ViewModel.SelectedEncoding.Value" />
+            <RadzenLabel Component="Dropdown_Encoding" Text="文字エンコード" />
+        </div>
+    }
+    @if (ViewModel.IsExcelSelected.Value)
+    {
+        <RadzenText Text="Excel形式ダウンロードメニュー" />
+        <div>
+            <RadzenCheckBox TValue="bool" Name="CheckBox_AsRawString" @bind-Value="ViewModel.AsRowString.Value" />
+            <RadzenLabel Component="CheckBox_AsRawString" Text="数値などを文字列として保存" />
+        </div>
+    }
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+        <RadzenButton Text="OK" Click="ViewModel.CommandOk.ToAsyncDelegate()" />
+        <RadzenButton Text="Cancel" Click="ViewModel.CommandCancel.ToAsyncDelegate()" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    /// <summary>
+    /// フォームの初期値に適用するファイルのデータを取得または設定します。
+    /// </summary>
+    [Parameter]
+    public TableFileInfo? FileData { get; set; }
+
+    /// <inheritdoc/>
+    protected override async Task OnInitializedAsync()
+    {
+        if (FileData is null) return;
+
+        if (FileData.Name.Contains('/')) ViewModel.FileType.Value = TableFileType.Excel;
+        else
+        {
+            if (FileData.Name.EndsWith(".tsv", StringComparison.OrdinalIgnoreCase)) ViewModel.Delimiter.Value = RowDelimiter.Tab;
+            else if (FileData.Name.EndsWith(".csv", StringComparison.OrdinalIgnoreCase)) ViewModel.Delimiter.Value = RowDelimiter.Comma;
+        }
+        await Task.CompletedTask;
+    }
+}

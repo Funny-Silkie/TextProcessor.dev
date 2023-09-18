@@ -24,6 +24,7 @@ namespace TextProcessor.ViewModels
     [InjectionRange(InjectionType.Transient)]
     public class EditViewModel : PageViewModel
     {
+        private readonly DialogService dialogService;
         private readonly MainModel mainModel;
         private readonly EditModel editModel;
         private readonly NotificationService notificationService;
@@ -82,9 +83,10 @@ namespace TextProcessor.ViewModels
         /// <summary>
         /// <see cref="EditViewModel"/>の新しいインスタンスを初期化します。
         /// </summary>
-        public EditViewModel(NavigationManager navigationManager, MainModel mainModel, EditModel editModel, NotificationService notificationService)
+        public EditViewModel(NavigationManager navigationManager, DialogService dialogService, MainModel mainModel, EditModel editModel, NotificationService notificationService)
             : base(navigationManager)
         {
+            this.dialogService = dialogService;
             this.mainModel = mainModel;
             this.editModel = editModel;
             this.notificationService = notificationService;
@@ -239,6 +241,18 @@ namespace TextProcessor.ViewModels
         /// </summary>
         private async Task Download()
         {
+            var options = new DialogOptions()
+            {
+                Width = "40vw",
+                Height = "25rem",
+            };
+            var parameters = new Dictionary<string, object>(StringComparer.Ordinal)
+            {
+                [nameof(Shared.Download.FileData)] = EditingFile.Value!,
+            };
+            DownloadViewModel? vm = await dialogService.OpenAsync<Shared.Download>("ダウンロード", parameters, options);
+            if (vm is null) return;
+
             TextData? data = ExecuteAllOperations();
             if (data is null)
             {
@@ -247,33 +261,73 @@ namespace TextProcessor.ViewModels
             }
 
             ViewData.Value = data;
-
             Stream? stream = null;
+            string fileName;
             try
             {
                 stream = new MemoryStream(1024 * 1024 * 16); // 16 MB
-                using (var writer = new StreamWriter(stream, leaveOpen: true))
+
+                switch (vm.FileType.Value)
                 {
-                    await data.WriteToAsync(writer, new TextSaveOptions("\t"));
+                    case TableFileType.Dsv:
+                        {
+                            fileName = EditingFile.Value!.Name;
+                            using (var writer = new StreamWriter(stream, leaveOpen: true))
+                            {
+                                await data.WriteToAsync(writer, new TextSaveOptions("\t"));
+                            }
+                            stream.Position = 0;
+                        }
+                        break;
+
+                    case TableFileType.Excel:
+                        {
+                            fileName = EditingFile.Value!.Name;
+                            string sheetName = EditingFile.Value!.Name;
+                            if (sheetName.Contains('/'))
+                            {
+                                string[] names = sheetName.Split('/');
+                                fileName = names[0];
+                                sheetName = names[1];
+                            }
+                            if (!fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase)
+                                && !fileName.EndsWith(".xlsm", StringComparison.OrdinalIgnoreCase))
+                                fileName = Path.ChangeExtension(fileName, ".xlsx");
+
+                            await Task.Run(() => data.SaveAsExcel(stream, sheetName, new ExcelSaveOptions(vm.AsRowString.Value)));
+                            stream.Position = 0;
+                        }
+                        break;
+
+                    default:
+                        notificationService.Notify(NotificationSeverity.Error, "ファイルのフォーマット指定が無効です");
+                        return;
                 }
-                stream.Position = 0;
             }
             catch
             {
+#if DEBUG
+                throw;
+#else
                 notificationService.Notify(NotificationSeverity.Error, "ファイル生成時にエラーが発生しました");
                 stream?.Dispose();
                 return;
+#endif
             }
 
-            await mainModel.DownloadFile(EditingFile.Value!.Name, stream);
             try
             {
+                await mainModel.DownloadFile(fileName, stream);
             }
             catch
             {
+#if DEBUG
+                throw;
+#else
                 notificationService.Notify(NotificationSeverity.Error, "ダウンロード時にエラーが発生しました");
                 stream.Dispose();
                 return;
+#endif
             }
             stream.Dispose();
         }

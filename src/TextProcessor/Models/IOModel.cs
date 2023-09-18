@@ -12,17 +12,17 @@ using TextProcessor.Logics.Data.Options;
 namespace TextProcessor.Models
 {
     /// <summary>
-    /// 読み込み画面のモデルのクラスです。
+    /// I/O画面のモデルのクラスです。
     /// </summary>
     [InjectionRange(InjectionType.Scoped)]
-    public class LoadModel : ModelBase
+    public class IOModel : ModelBase
     {
         /// <summary>
         /// サポートするエンコード一覧を取得します。
         /// </summary>
         public static Dictionary<string, EncodingInfo> EncodingTable { get; }
 
-        static LoadModel()
+        static IOModel()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -42,7 +42,7 @@ namespace TextProcessor.Models
         #region Properties
 
         /// <summary>
-        /// 読み込むファイルの種類を取得または設定します。
+        /// 扱うファイルの種類を取得または設定します。
         /// </summary>
         public ReactiveProperty<TableFileType> FileType { get; }
 
@@ -69,9 +69,9 @@ namespace TextProcessor.Models
         #endregion Properties
 
         /// <summary>
-        /// <see cref="LoadModel"/>の新しいインスタンスを初期化します。
+        /// <see cref="IOModel"/>の新しいインスタンスを初期化します。
         /// </summary>
-        public LoadModel(MainModel mainModel)
+        public IOModel(MainModel mainModel)
         {
             this.mainModel = mainModel;
 

@@ -1,4 +1,4 @@
-﻿@page "/edit"
+@page "/edit"
 @inject EditViewModel ViewModel
 @inject DialogService DialogService
 
@@ -15,7 +15,7 @@
                     <RadzenButton Text="追加" ButtonStyle="ButtonStyle.Primary" Disabled="ViewModel.EditingFile.Value is null" Click="OpenAddOperationDialog" />
                     <RadzenButton Text="処理実行" ButtonStyle="ButtonStyle.Success" IsBusy="isInOpeartionProgress" Disabled="ViewModel.EditingFile.Value is null" Click="ExecuteOperation" />
                     <RadzenButton Text="処理スキップ" ButtonStyle="ButtonStyle.Light" Disabled="ViewModel.EditingFile.Value is null" Click="AsRaw" />
-                    <RadzenButton Icon="file_download" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" IsBusy="isInOpeartionProgress" Disabled="ViewModel.EditingFile.Value is null" Click="StartDownload" />
+                    <RadzenButton Icon="file_download" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" IsBusy="isInOpeartionProgress" Disabled="ViewModel.EditingFile.Value is null" Click="ViewModel.DownloadCommand.ToAsyncDelegate()" />
                 </RadzenStack>
             </RadzenStack>
         </RadzenSplitterPane>
@@ -44,6 +44,9 @@
     private bool isInOpeartionProgress;
     private RadzenSplitterPane? logSplitterPane;
 
+    /// <summary>
+    /// 処理追加ダイアログを表示します。
+    /// </summary>
     private async Task OpenAddOperationDialog()
     {
         var options = new DialogOptions()
@@ -57,6 +60,9 @@
         await ViewModel.EndAddOperationCommand.ExecuteAsync(vm);
     }
 
+    /// <summary>
+    /// ログ画面の折りたたみ状態が変わったときに更新されます。
+    /// </summary>
     private async Task UpdateLogCollapsed()
     {
         if (logSplitterPane is null) return;
@@ -64,6 +70,9 @@
         await Task.CompletedTask;
     }
 
+    /// <summary>
+    /// 処理を実行します。
+    /// </summary>
     private async Task ExecuteOperation()
     {
         isInOpeartionProgress = true;
@@ -73,17 +82,13 @@
         if (ViewModel.ViewData.Value != prevData) await InvokeAsync(dsvView.RequestRender);
     }
 
+    /// <summary>
+    /// 生データを表示します。
+    /// </summary>
     private async Task AsRaw()
     {
-        await ViewModel.AsRawCommand.ExecuteAsync();   
+        await ViewModel.AsRawCommand.ExecuteAsync();
         await InvokeAsync(dsvView.RequestRender);
-    }
-
-    private async Task StartDownload()
-    {
-        isInOpeartionProgress = true;
-        await ViewModel.DownloadCommand.ExecuteAsync();
-        isInOpeartionProgress = false;
     }
 
     /// <inheritdoc/>

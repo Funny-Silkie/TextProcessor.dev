@@ -33,13 +33,13 @@ namespace TextProcessor.ViewModels
         }
 
         private readonly DialogService dialogService;
+        private readonly IOModel ioModel;
         private readonly NotificationService notificationService;
-        private readonly LoadModel loadModel;
 
         /// <summary>
         /// サポートする文字エンコードの名称一覧を取得します。
         /// </summary>
-        public ICollection<string> EncodingNames => LoadModel.EncodingTable.Keys;
+        public ICollection<string> EncodingNames => IOModel.EncodingTable.Keys;
 
         #region Properties
 
@@ -48,7 +48,7 @@ namespace TextProcessor.ViewModels
         /// </summary>
         public ReactivePropertySlim<IBrowserFile?> CurrentFile { get; }
 
-        /// <inheritdoc cref="LoadModel.FileType"/>
+        /// <inheritdoc cref="IOModel.FileType"/>
         public ReactivePropertySlim<TableFileType> FileType { get; }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace TextProcessor.ViewModels
         /// </summary>
         public ReadOnlyReactivePropertySlim<bool> IsDsvSelected { get; }
 
-        /// <inheritdoc cref="LoadModel.Delimiter"/>
+        /// <inheritdoc cref="IOModel.Delimiter"/>
         public ReactivePropertySlim<RowDelimiter> Delimiter { get; }
 
         /// <summary>
@@ -64,13 +64,13 @@ namespace TextProcessor.ViewModels
         /// </summary>
         public ReadOnlyReactivePropertySlim<bool> IsOtherDelimiter { get; }
 
-        /// <inheritdoc cref="LoadModel.OtherDelimiter"/>
+        /// <inheritdoc cref="IOModel.OtherDelimiter"/>
         public ReactivePropertySlim<string> OtherDelimiter { get; }
 
-        /// <inheritdoc cref="LoadModel.HasHeader"/>
+        /// <inheritdoc cref="IOModel.HasHeader"/>
         public ReactivePropertySlim<bool> HasHeader { get; }
 
-        /// <inheritdoc cref="LoadModel.SelectedEncoding"/>
+        /// <inheritdoc cref="IOModel.SelectedEncoding"/>
         public ReactivePropertySlim<string> SelectedEncoding { get; }
 
         #endregion Properties
@@ -92,29 +92,29 @@ namespace TextProcessor.ViewModels
         /// <summary>
         /// <see cref="LoadViewModel"/>の新しいインスタンスを初期化します。
         /// </summary>
-        public LoadViewModel(NavigationManager navigationManager, LoadModel loadModel, NotificationService notificationService, DialogService dialogService)
+        public LoadViewModel(NavigationManager navigationManager, IOModel ioModel, NotificationService notificationService, DialogService dialogService)
             : base(navigationManager)
         {
             this.dialogService = dialogService;
-            this.loadModel = loadModel;
+            this.ioModel = ioModel;
             this.notificationService = notificationService;
 
             CurrentFile = new ReactivePropertySlim<IBrowserFile?>().AddTo(DisposableList);
-            FileType = loadModel.FileType.ToReactivePropertySlimAsSynchronized(x => x.Value)
+            FileType = ioModel.FileType.ToReactivePropertySlimAsSynchronized(x => x.Value)
                                          .AddTo(DisposableList);
-            IsDsvSelected = loadModel.FileType.Select(x => x == TableFileType.Dsv)
+            IsDsvSelected = ioModel.FileType.Select(x => x == TableFileType.Dsv)
                                               .ToReadOnlyReactivePropertySlim()
                                               .AddTo(DisposableList);
-            Delimiter = loadModel.Delimiter.ToReactivePropertySlimAsSynchronized(x => x.Value)
+            Delimiter = ioModel.Delimiter.ToReactivePropertySlimAsSynchronized(x => x.Value)
                                            .AddTo(DisposableList);
             IsOtherDelimiter = Delimiter.Select(x => x == RowDelimiter.Others)
                                         .ToReadOnlyReactivePropertySlim()
                                         .AddTo(DisposableList);
-            OtherDelimiter = loadModel.OtherDelimiter.ToReactivePropertySlimAsSynchronized(x => x.Value)
+            OtherDelimiter = ioModel.OtherDelimiter.ToReactivePropertySlimAsSynchronized(x => x.Value)
                                                      .AddTo(DisposableList);
-            HasHeader = loadModel.HasHeader.ToReactivePropertySlimAsSynchronized(x => x.Value)
+            HasHeader = ioModel.HasHeader.ToReactivePropertySlimAsSynchronized(x => x.Value)
                                            .AddTo(DisposableList);
-            SelectedEncoding = loadModel.SelectedEncoding.ToReactivePropertySlimAsSynchronized(x => x.Value)
+            SelectedEncoding = ioModel.SelectedEncoding.ToReactivePropertySlimAsSynchronized(x => x.Value)
                                                          .AddTo(DisposableList);
 
             OnFileChangedCommand = new AsyncReactiveCommand<IBrowserFile?>().WithSubscribe(OnFileChanged)
@@ -173,7 +173,7 @@ namespace TextProcessor.ViewModels
 
             try
             {
-                await loadModel.Load(file);
+                await ioModel.Load(file);
             }
             catch (FileFormatException)
             {
