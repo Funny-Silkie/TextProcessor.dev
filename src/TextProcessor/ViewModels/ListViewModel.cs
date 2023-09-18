@@ -20,20 +20,20 @@ namespace TextProcessor.ViewModels
         /// <summary>
         /// ファイル一覧を取得します。
         /// </summary>
-        public ReadOnlyReactiveCollection<DsvFileInfo> Files { get; }
+        public ReadOnlyReactiveCollection<TableFileInfo> Files { get; }
 
         #endregion Properties
 
         #region Commands
 
-        /// <inheritdoc cref="View(DsvFileInfo)"/>
-        public AsyncReactiveCommand<DsvFileInfo> ViewCommand { get; }
+        /// <inheritdoc cref="View(TableFileInfo)"/>
+        public AsyncReactiveCommand<TableFileInfo> ViewCommand { get; }
 
-        /// <inheritdoc cref="Edit(DsvFileInfo)"/>
-        public AsyncReactiveCommand<DsvFileInfo> EditCommand { get; }
+        /// <inheritdoc cref="Edit(TableFileInfo)"/>
+        public AsyncReactiveCommand<TableFileInfo> EditCommand { get; }
 
-        /// <inheritdoc cref="Delete(DsvFileInfo)"/>
-        public AsyncReactiveCommand<DsvFileInfo> DeleteCommand { get; }
+        /// <inheritdoc cref="Delete(TableFileInfo)"/>
+        public AsyncReactiveCommand<TableFileInfo> DeleteCommand { get; }
 
         #endregion Commands
 
@@ -47,11 +47,11 @@ namespace TextProcessor.ViewModels
 
             Files = mainModel.Files.ToReadOnlyReactiveCollection()
                                    .AddTo(DisposableList);
-            ViewCommand = new AsyncReactiveCommand<DsvFileInfo>().WithSubscribe(View)
+            ViewCommand = new AsyncReactiveCommand<TableFileInfo>().WithSubscribe(View)
                                                                  .AddTo(DisposableList);
-            EditCommand = new AsyncReactiveCommand<DsvFileInfo>().WithSubscribe(Edit)
+            EditCommand = new AsyncReactiveCommand<TableFileInfo>().WithSubscribe(Edit)
                                                                  .AddTo(DisposableList);
-            DeleteCommand = new AsyncReactiveCommand<DsvFileInfo>().WithSubscribe(Delete)
+            DeleteCommand = new AsyncReactiveCommand<TableFileInfo>().WithSubscribe(Delete)
                                                                    .AddTo(DisposableList);
         }
 
@@ -59,7 +59,7 @@ namespace TextProcessor.ViewModels
         /// 閲覧画面に遷移します。
         /// </summary>
         /// <param name="file">閲覧するファイル</param>
-        private async Task View(DsvFileInfo file)
+        private async Task View(TableFileInfo file)
         {
             int index = Files.IndexOf(file);
             if (index < 0) NavigationManager.NavigateTo("raw");
@@ -71,7 +71,7 @@ namespace TextProcessor.ViewModels
         /// 編集画面に遷移します。
         /// </summary>
         /// <param name="file">編集するファイル</param>
-        private async Task Edit(DsvFileInfo file)
+        private async Task Edit(TableFileInfo file)
         {
             mainModel.CurrentEditData.Value = file;
             NavigationManager.NavigateTo("edit");
@@ -83,7 +83,7 @@ namespace TextProcessor.ViewModels
         /// </summary>
         /// <param name="file">削除するファイル</param>
         /// <returns></returns>
-        private async Task Delete(DsvFileInfo file)
+        private async Task Delete(TableFileInfo file)
         {
             mainModel.Files.RemoveOnScheduler(file);
             if (mainModel.CurrentEditData.Value == file) mainModel.CurrentEditData.Value = null;

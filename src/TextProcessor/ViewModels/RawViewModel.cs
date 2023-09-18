@@ -15,12 +15,12 @@ namespace TextProcessor.ViewModels
         /// <summary>
         /// ファイル一覧を取得します。
         /// </summary>
-        public ReadOnlyReactiveCollection<DsvFileInfo> Files { get; }
+        public ReadOnlyReactiveCollection<TableFileInfo> Files { get; }
 
         /// <summary>
         /// 選択中ファイルを取得または設定します。
         /// </summary>
-        public ReactivePropertySlim<DsvFileInfo?> SelectedData { get; }
+        public ReactivePropertySlim<TableFileInfo?> SelectedData { get; }
 
         /// <summary>
         /// <see cref="RawViewModel"/>の新しいインスタンスを初期化します。
@@ -30,7 +30,7 @@ namespace TextProcessor.ViewModels
         {
             Files = mainModel.Files.ToReadOnlyReactiveCollection()
                                    .AddTo(DisposableList);
-            SelectedData = new ReactivePropertySlim<DsvFileInfo?>().AddTo(DisposableList);
+            SelectedData = new ReactivePropertySlim<TableFileInfo?>().AddTo(DisposableList);
         }
     }
 }

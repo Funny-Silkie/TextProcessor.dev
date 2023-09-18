@@ -16,7 +16,7 @@ namespace TextProcessor.ViewModels
         /// <summary>
         /// ファイル一覧を取得します。
         /// </summary>
-        public ReadOnlyReactiveCollection<DsvFileInfo> Files { get; }
+        public ReadOnlyReactiveCollection<TableFileInfo> Files { get; }
 
         #endregion Properties
 

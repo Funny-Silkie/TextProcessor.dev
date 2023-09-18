@@ -1,4 +1,5 @@
-﻿using TextProcessor.Logics.Data;
+﻿using System.Text;
+using TextProcessor.Logics.Data;
 using TextProcessor.Logics.Data.Options;
 
 namespace Test
@@ -16,7 +17,7 @@ namespace Test
         /// <returns><paramref name="fileName"/>に応じた<see cref="TextData"/>のインスタンス</returns>
         public static TextData LoadFile(string fileName, TextLoadOptions? options = null)
         {
-            return TextData.Create(fileName, options ?? new TextLoadOptions(true, "\t"));
+            return TextData.CreateFromDsv(fileName, options ?? new TextLoadOptions(true, "\t", new UTF8Encoding(false)));
         }
     }
 }

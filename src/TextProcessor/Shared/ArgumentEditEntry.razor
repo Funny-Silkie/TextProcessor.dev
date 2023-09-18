@@ -43,7 +43,7 @@
         </RadzenPanel>
         break;
     case ArgumentType.TextData:
-        <RadzenDropDown TValue="DsvFileInfo" Name="@(ComponentName)" Data="ViewModel.Files" Value="@(ViewModel.Files.FirstOrDefault(x => x.Data == Getter.Invoke()))" ValueChanged="x => Setter.Invoke(x.Data)" TextProperty="Name" />
+        <RadzenDropDown TValue="TableFileInfo" Name="@(ComponentName)" Data="ViewModel.Files" Value="@(ViewModel.Files.FirstOrDefault(x => x.Data == Getter.Invoke()))" ValueChanged="x => Setter.Invoke(x.Data)" TextProperty="Name" />
         break;
     case ArgumentType.ValueConversion:
         <ConditionEdit TValue="ValueConversion" Name="@(ComponentName)" Value="@(Getter.Invoke())" ValueChanged="x => Setter.Invoke(x)" />

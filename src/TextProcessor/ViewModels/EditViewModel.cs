@@ -34,12 +34,12 @@ namespace TextProcessor.ViewModels
         /// <summary>
         /// ファイル一覧を取得します。
         /// </summary>
-        public ReadOnlyReactiveCollection<DsvFileInfo> Files { get; }
+        public ReadOnlyReactiveCollection<TableFileInfo> Files { get; }
 
         /// <summary>
         /// 編集中のファイルを取得または設定します。
         /// </summary>
-        public ReactivePropertySlim<DsvFileInfo?> EditingFile { get; }
+        public ReactivePropertySlim<TableFileInfo?> EditingFile { get; }
 
         /// <summary>
         /// 表示データを取得または設定します。
@@ -94,7 +94,7 @@ namespace TextProcessor.ViewModels
                                    .AddTo(DisposableList);
             LogTableCollapsed = editModel.SendLogNotification.ToReactivePropertySlimAsSynchronized(x => x.Value)
                                                              .AddTo(DisposableList);
-            EditingFile = new ReactivePropertySlim<DsvFileInfo?>(mainModel.CurrentEditData.Value).AddTo(DisposableList);
+            EditingFile = new ReactivePropertySlim<TableFileInfo?>(mainModel.CurrentEditData.Value).AddTo(DisposableList);
             ViewData = new ReactivePropertySlim<TextData?>().AddTo(DisposableList);
             EditingFile.Subscribe(OnSelectionChanged).AddTo(DisposableList);
             LogList = editModel.LogList.ToReadOnlyReactiveCollection()
@@ -184,9 +184,9 @@ namespace TextProcessor.ViewModels
         /// 編集ファイルが変更されたときに通知されます。
         /// </summary>
         /// <param name="value">変更後の値</param>
-        private void OnSelectionChanged(DsvFileInfo? value)
+        private void OnSelectionChanged(TableFileInfo? value)
         {
-            DsvFileInfo? old = mainModel.CurrentEditData.Value;
+            TableFileInfo? old = mainModel.CurrentEditData.Value;
             mainModel.CurrentEditData.Value = value;
 
             if (old is not null)
@@ -284,7 +284,7 @@ namespace TextProcessor.ViewModels
         /// <param name="operation">削除する処理</param>
         public async Task RemoveOperation(OperationViewModel operation)
         {
-            DsvFileInfo? data = EditingFile.Value;
+            TableFileInfo? data = EditingFile.Value;
             if (data is null) return;
             Operations.RemoveOnScheduler(operation);
             data.Operations.Remove(operation.Operation);
@@ -355,7 +355,7 @@ namespace TextProcessor.ViewModels
                     new[] { "4", "Yamada", "16", },
                 });
                 data1.HasHeader = true;
-                var info1 = new DsvFileInfo("test1.tsv", data1);
+                var info1 = new TableFileInfo("test1.tsv", data1);
                 mainModel.Files.AddOnScheduler(info1);
                 var data2 = TextData.CreateFromRawData(new[]
                 {
@@ -366,7 +366,7 @@ namespace TextProcessor.ViewModels
                     new[] { "5", "Yokohama" },
                 });
                 data2.HasHeader = true;
-                var info2 = new DsvFileInfo("test2.tsv", data2);
+                var info2 = new TableFileInfo("test2.tsv", data2);
                 mainModel.Files.AddOnScheduler(info2);
                 EditingFile.Value = info1;
             }

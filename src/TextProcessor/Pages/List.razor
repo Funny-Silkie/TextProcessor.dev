@@ -1,25 +1,25 @@
 ﻿@page "/list"
 @inject ListViewModel ViewModel
 
-<RadzenDataGrid TItem="DsvFileInfo" Data="ViewModel.Files" AllowPaging="true" AllowColumnResize="true" PageSize="20">
+<RadzenDataGrid TItem="TableFileInfo" Data="ViewModel.Files" AllowPaging="true" AllowColumnResize="true" PageSize="20">
     <Columns>
-        <RadzenDataGridColumn TItem="DsvFileInfo" Title="ファイル名" Property="Name" Width="50%" />
-        <RadzenDataGridColumn TItem="DsvFileInfo" Title="ヘッダー">
+        <RadzenDataGridColumn TItem="TableFileInfo" Title="ファイル名" Property="Name" Width="50%" />
+        <RadzenDataGridColumn TItem="TableFileInfo" Title="ヘッダー">
             <Template>
                 <RadzenCheckBox TValue="bool" @bind-Value="context.Data.HasHeader" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="DsvFileInfo" Width="100" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn TItem="TableFileInfo" Width="100" TextAlign="TextAlign.Center">
             <Template>
                 <RadzenButton Text="表示" Click="x => ViewModel.ViewCommand.ExecuteAsync(context)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="DsvFileInfo" Width="100" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn TItem="TableFileInfo" Width="100" TextAlign="TextAlign.Center">
             <Template>
                 <RadzenButton Text="編集" ButtonStyle="ButtonStyle.Success" Click="x => ViewModel.EditCommand.ExecuteAsync(context)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="DsvFileInfo" Width="50" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn TItem="TableFileInfo" Width="50" TextAlign="TextAlign.Center">
             <Template>
                 <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Dark" Variant="Variant.Text" Click="x => ViewModel.DeleteCommand.ExecuteAsync(context)" />
             </Template>

@@ -1,30 +1,72 @@
 ﻿@page "/load"
+@using System.Text;
 @inject LoadViewModel ViewModel
 
-<div>
-    <RadzenLabel Component="RadioButtonList_Delimiter" Text="行区切り文字" />
-    <RadzenRadioButtonList Name="RadioButtonList_Delimiter" TValue="RowDelimiter" @bind-Value="ViewModel.Delimiter.Value">
-        <Items>
-            <RadzenRadioButtonListItem Text="タブ文字" Value="@(RowDelimiter.Tab)" />
-            <RadzenRadioButtonListItem Text="カンマ" Value="@(RowDelimiter.Comma)" />
-            <RadzenRadioButtonListItem Text="その他" Value="@(RowDelimiter.Others)" />
-        </Items>
-    </RadzenRadioButtonList>
-</div>
-<div>
-    <RadzenTextBox Name="TextBox_OtherDelimiter" @bind-Value="ViewModel.OtherDelimiter.Value" Disabled="!ViewModel.IsOtherDelimiter.Value" />
-    <RadzenLabel Component="TextBox_OtherDelimiter" Text="その他行区切り文字" />
-</div>
-<div>
-    <RadzenCheckBox Name="CheckBox_HasHeader" TValue="bool" @bind-Value="ViewModel.HasHeader.Value" />
-    <RadzenLabel Component="CheckBox_HasHeader" Text="先頭行をヘッダーとして扱う" />
-</div>
-
-<InputFile OnChange="ViewModel.LoadCommand.ToAsyncDelegate()" />
+<RadzenStack JustifyContent="JustifyContent.Start">
+    <InputFile @onclick="OnFileClick" OnChange="OnFileChanged" />
+    <div>
+        <RadzenLabel Component="RadioButtonList_FileType" Text="ファイルの種類" />
+        <RadzenRadioButtonList Name="RadioButtonList_FileType" TValue="TableFileType" @bind-Value="ViewModel.FileType.Value">
+            <Items>
+                <RadzenRadioButtonListItem Text="CSV/TSV" Value="@(TableFileType.Dsv)" />
+                <RadzenRadioButtonListItem Text="Excel" Value="@(TableFileType.Excel)" />
+            </Items>
+        </RadzenRadioButtonList>
+    </div>
+    <div>
+        <RadzenCheckBox Name="CheckBox_HasHeader" TValue="bool" @bind-Value="ViewModel.HasHeader.Value" />
+        <RadzenLabel Component="CheckBox_HasHeader" Text="先頭行をヘッダーとして扱う" />
+    </div>
+    @if (ViewModel.IsDsvSelected.Value)
+    {
+        <RadzenText Text="CSV/TSV読み込みメニュー" />
+        <div>
+            <RadzenLabel Component="RadioButtonList_Delimiter" Text="行区切り文字" />
+            <RadzenRadioButtonList Name="RadioButtonList_Delimiter" TValue="RowDelimiter" @bind-Value="ViewModel.Delimiter.Value">
+                <Items>
+                    <RadzenRadioButtonListItem Text="タブ文字" Value="@(RowDelimiter.Tab)" />
+                    <RadzenRadioButtonListItem Text="カンマ" Value="@(RowDelimiter.Comma)" />
+                    <RadzenRadioButtonListItem Text="その他" Value="@(RowDelimiter.Others)" />
+                </Items>
+            </RadzenRadioButtonList>
+        </div>
+        if (ViewModel.IsOtherDelimiter.Value)
+        {
+            <div>
+                <RadzenTextBox Name="TextBox_OtherDelimiter" @bind-Value="ViewModel.OtherDelimiter.Value" />
+                <RadzenLabel Component="TextBox_OtherDelimiter" Text="その他行区切り文字" />
+            </div>
+        }
+        <div>
+            <RadzenDropDown TValue="string" Name="Dropdown_Encoding" Data="ViewModel.EncodingNames" @bind-Value="ViewModel.SelectedEncoding.Value" />
+            <RadzenLabel Component="Dropdown_Encoding" Text="文字エンコード" />
+        </div>
+    }
+    <RadzenButton Disabled="ViewModel.CurrentFile.Value is null" Text="読み込み" Click="ViewModel.LoadCommand.ToAsyncDelegate()" Style="width: 100px" />
+</RadzenStack>
 
 @code {
+    /// <inheritdoc/>
     protected override async Task OnInitializedAsync()
     {
         await ViewModel.InitializeAsync();
+    }
+
+    /// <summary>
+    /// ファイルのリセットを行います。
+    /// </summary>
+    private async Task OnFileClick()
+    {
+        await ViewModel.OnFileChangedCommand.ExecuteAsync(null);
+    }
+
+    /// <summary>
+    /// 読み込むファイルの設定を行います。
+    /// </summary>
+    /// <param name="e">イベント引数</param>
+    private async Task OnFileChanged(InputFileChangeEventArgs e)
+    {
+        IReadOnlyList<IBrowserFile> files = e.GetMultipleFiles(1);
+        await ViewModel.OnFileChangedCommand.ExecuteAsync(files.FirstOrDefault());
     }
 }

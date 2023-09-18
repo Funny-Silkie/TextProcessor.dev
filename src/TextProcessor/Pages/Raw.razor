@@ -4,7 +4,7 @@
 
 <div>
     <RadzenLabel Component="DropDown_FileName" Text="表示するファイル名" />
-    <RadzenDropDown TValue="DsvFileInfo" Name="DropDown_FileName" Data="ViewModel.Files" Change="OnSelectionChanged" @bind-Value="ViewModel.SelectedData.Value" TextProperty="Name" />
+    <RadzenDropDown TValue="TableFileInfo" Name="DropDown_FileName" Data="ViewModel.Files" Change="OnSelectionChanged" @bind-Value="ViewModel.SelectedData.Value" TextProperty="Name" />
 </div>
 
 @if (ViewModel.SelectedData.Value is not null)

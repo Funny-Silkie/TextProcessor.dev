@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClosedXML.Excel;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -57,7 +58,7 @@ namespace TextProcessor.Logics.Data
         }
 
         /// <summary>
-        /// ファイルを読み込んで<see cref="TextData"/>のインスタンスを生成します。
+        /// DSVファイルを読み込んで<see cref="TextData"/>のインスタンスを生成します。
         /// </summary>
         /// <param name="fileName">読み込むファイルパス</param>
         /// <param name="options">読み込み時のオプション</param>
@@ -70,21 +71,21 @@ namespace TextProcessor.Logics.Data
         /// <exception cref="IOException">I/Oエラーが発生した</exception>
         /// <exception cref="OutOfMemoryException">メモリ不足</exception>
         /// <exception cref="System.Text.RegularExpressions.RegexMatchTimeoutException">正規表現検索時にタイムアウトが発生</exception>
-        public static TextData Create(string fileName, TextLoadOptions options)
+        public static TextData CreateFromDsv(string fileName, TextLoadOptions options)
         {
             using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return Create(stream, options);
+            return CreateFromDsv(stream, options);
         }
 
-        /// <inheritdoc cref="Create(Stream, TextLoadOptions)"/>
-        public static async Task<TextData> CreateAsync(string fileName, TextLoadOptions options)
+        /// <inheritdoc cref="CreateFromDsv(Stream, TextLoadOptions)"/>
+        public static async Task<TextData> CreateFromDsvAsync(string fileName, TextLoadOptions options)
         {
             using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return await CreateAsync(stream, options);
+            return await CreateFromDsvAsync(stream, options);
         }
 
         /// <summary>
-        /// ストリームオブジェクトを読み込んで<see cref="TextData"/>のインスタンスを生成します。
+        /// DSVのストリームオブジェクトを読み込んで<see cref="TextData"/>のインスタンスを生成します。
         /// </summary>
         /// <param name="stream">読み込むストリームオブジェクト</param>
         /// <param name="options">読み込み時のオプション</param>
@@ -95,7 +96,7 @@ namespace TextProcessor.Logics.Data
         /// <exception cref="IOException">I/Oエラーが発生した</exception>
         /// <exception cref="OutOfMemoryException">メモリ不足</exception>
         /// <exception cref="System.Text.RegularExpressions.RegexMatchTimeoutException">正規表現検索時にタイムアウトが発生</exception>
-        public static TextData Create(Stream stream, TextLoadOptions options)
+        public static TextData CreateFromDsv(Stream stream, TextLoadOptions options)
         {
             ArgumentNullException.ThrowIfNull(stream);
             ArgumentNullException.ThrowIfNull(options);
@@ -120,8 +121,8 @@ namespace TextProcessor.Logics.Data
             return result;
         }
 
-        /// <inheritdoc cref="Create(Stream, TextLoadOptions)"/>
-        public static async Task<TextData> CreateAsync(Stream stream, TextLoadOptions options)
+        /// <inheritdoc cref="CreateFromDsv(Stream, TextLoadOptions)"/>
+        public static async Task<TextData> CreateFromDsvAsync(Stream stream, TextLoadOptions options)
         {
             ArgumentNullException.ThrowIfNull(stream);
             ArgumentNullException.ThrowIfNull(options);
@@ -143,6 +144,59 @@ namespace TextProcessor.Logics.Data
             }
 
             result.FillBlanks();
+            return result;
+        }
+
+        /// <summary>
+        /// Excelファイルのストリームオブジェクトを読み込んで<see cref="TextData"/>のインスタンスを生成します。
+        /// </summary>
+        /// <param name="stream">読み込むストリームオブジェクト</param>
+        /// <returns>Excelファイルを基に作成された<see cref="TextData"/>のインスタンス一覧</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="stream"/>または<paramref name="options"/>が<see langword="null"/></exception>
+        /// <exception cref="ArgumentException"><paramref name="stream"/>が読み取りをサポートしない</exception>
+        /// <exception cref="ObjectDisposedException"><paramref name="stream"/>が既に破棄されている</exception>
+        /// <exception cref="IOException">I/Oエラーが発生した</exception>
+        public static (string sheetName, TextData data)[] CreateFromExcel(Stream stream, ExcelLoadOptions options)
+        {
+            ArgumentNullException.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(options);
+
+            using var workBook = new XLWorkbook(stream);
+            var result = new (string, TextData)[workBook.Worksheets.Count];
+            int resultIndex = 0;
+            foreach (IXLWorksheet workSheet in workBook.Worksheets)
+            {
+                var data = new List<List<string>>(workSheet.RowCount());
+                foreach (IXLRow row in workSheet.Rows())
+                {
+                    if (row.CellCount() == 0)
+                    {
+                        data.Add(new List<string>());
+                        continue;
+                    }
+                    IXLCells cells = row.CellsUsed();
+                    var list = new List<string>(row.CellCount());
+                    data.Add(list);
+                    int columnIndex = 0;
+                    foreach (IXLCell cell in cells)
+                    {
+                        while (cell.Address.ColumnNumber - 1 > columnIndex)
+                        {
+                            list.Add(string.Empty);
+                            columnIndex++;
+                        }
+                        list.Add(cell.Value.ToString());
+                        columnIndex++;
+                    }
+                }
+
+                var currentResult = new TextData(data)
+                {
+                    HasHeader = options.HasHeader,
+                };
+                currentResult.FillBlanks();
+                result[resultIndex++] = (workSheet.Name, currentResult);
+            }
             return result;
         }
 

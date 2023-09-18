@@ -4,7 +4,7 @@
 
 <RadzenStack>
     <div>
-        <RadzenDropDown Name="DropDown_SelectedFile" TValue="DsvFileInfo" Data="ViewModel.Files" Change="async x => await InvokeAsync(dsvView.RequestRender)" @bind-Value="ViewModel.EditingFile.Value" TextProperty="Name" />
+        <RadzenDropDown Name="DropDown_SelectedFile" TValue="TableFileInfo" Data="ViewModel.Files" Change="async x => await InvokeAsync(dsvView.RequestRender)" @bind-Value="ViewModel.EditingFile.Value" TextProperty="Name" />
         <RadzenLabel Component="DropDown_SelectedFile" Text="編集するファイル" />
     </div>
     <RadzenSplitter Style="width: calc(100vw - 320px)" Collapse="UpdateLogCollapsed" Expand="UpdateLogCollapsed">
