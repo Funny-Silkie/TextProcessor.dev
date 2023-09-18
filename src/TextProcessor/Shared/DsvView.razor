@@ -21,9 +21,29 @@
 }
 
 @code {
+    private bool renderEnabled = true;
+
     [Parameter]
     public required TextData? Data { get; set; }
 
     [Parameter]
     public string? Style { get; set; }
+
+    /// <summary>
+    /// 再描画をリクエストします。
+    /// </summary>
+    public void RequestRender()
+    {
+        renderEnabled = true;
+    }
+
+    /// <inheritdoc/>
+    protected override bool ShouldRender() => renderEnabled;
+
+    /// <inheritdoc/>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        renderEnabled = false;
+        await Task.CompletedTask;
+    }
 }

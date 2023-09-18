@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using TextProcessor.Logics.Operations.Conditions;
+using TextProcessor.Logics.Operations.Conversions;
 
 namespace TextProcessor.Logics.Operations
 {
@@ -9,6 +11,12 @@ namespace TextProcessor.Logics.Operations
     [Serializable]
     public sealed class ArgumentInfo
     {
+        #region Parameter Names
+
+        internal const string ParamCtor = "Ctor";
+
+        #endregion Parameter Names
+
         /// <summary>
         /// 引数の種類を取得します。
         /// </summary>
@@ -59,6 +67,13 @@ namespace TextProcessor.Logics.Operations
         }
 
         /// <summary>
+        /// 追加で使用するパラメータを取得します。
+        /// </summary>
+        public IDictionary<string, dynamic> Parameters => _parameters ??= new Dictionary<string, object>(StringComparer.Ordinal);
+
+        private Dictionary<string, dynamic>? _parameters;
+
+        /// <summary>
         /// <see cref="ArgumentInfo"/>の新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="type">引数の種類</param>
@@ -78,14 +93,11 @@ namespace TextProcessor.Logics.Operations
         }
 
         /// <summary>
-        /// <see cref="ArgumentType"/>に対応した既定値を取得します。
+        /// 対応した既定値を取得します。
         /// </summary>
-        /// <param name="type">データ型</param>
-        /// <returns><paramref name="type"/>に対応する既定値</returns>
-        /// <exception cref="NotSupportedException"><paramref name="type"/>が無効</exception>
-        public static object? GetDefaultValue(ArgumentType type)
+        public object? GetDefaultValue()
         {
-            type &= (~ArgumentType.Array) & (~ArgumentType.List);
+            ArgumentType type = Type & (~ArgumentType.Array) & (~ArgumentType.List);
             return type switch
             {
                 ArgumentType.String or ArgumentType.StringMultiLine => string.Empty,
@@ -97,8 +109,42 @@ namespace TextProcessor.Logics.Operations
                 ArgumentType.ValueCondition => ValueCondition.Null,
                 ArgumentType.RowCondition => RowCondition.Null,
                 ArgumentType.TextData => null,
+                ArgumentType.ValueConversion => ValueConversion.Through,
+                ArgumentType.Arguments => this.GetCtor().Invoke(),
                 _ => throw new NotSupportedException(),
             };
+        }
+    }
+
+    /// <summary>
+    /// <see cref="ArgumentInfo"/>の拡張を記述します。
+    /// </summary>
+    public static class ArgumentInfoExtension
+    {
+        /// <summary>
+        /// インスタンス生成関数を取得します。
+        /// </summary>
+        /// <param name="info">対象引数</param>
+        /// <returns>インスタンス生成関数</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="info"/>が<see langword="null"/></exception>
+        public static Func<dynamic> GetCtor(this ArgumentInfo info)
+        {
+            ArgumentNullException.ThrowIfNull(info);
+            return info.Parameters[ArgumentInfo.ParamCtor];
+        }
+
+        /// <summary>
+        /// インスタンス生成関数を設定します。
+        /// </summary>
+        /// <param name="info">対象引数</param>
+        /// <param name="ctor">設定するインスタンス生成関数</param>
+        /// <exception cref="ArgumentNullException"><paramref name="info"/>が<see langword="null"/></exception>
+        public static void SetCtor(this ArgumentInfo info, Func<dynamic> ctor)
+        {
+            ArgumentNullException.ThrowIfNull(info);
+            ArgumentNullException.ThrowIfNull(ctor);
+
+            info.Parameters[ArgumentInfo.ParamCtor] = ctor;
         }
     }
 }

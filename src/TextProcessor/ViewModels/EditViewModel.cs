@@ -24,6 +24,7 @@ namespace TextProcessor.ViewModels
     [InjectionRange(InjectionType.Transient)]
     public class EditViewModel : PageViewModel
     {
+        private readonly DialogService dialogService;
         private readonly MainModel mainModel;
         private readonly EditModel editModel;
         private readonly NotificationService notificationService;
@@ -34,12 +35,12 @@ namespace TextProcessor.ViewModels
         /// <summary>
         /// ファイル一覧を取得します。
         /// </summary>
-        public ReadOnlyReactiveCollection<DsvFileInfo> Files { get; }
+        public ReadOnlyReactiveCollection<TableFileInfo> Files { get; }
 
         /// <summary>
         /// 編集中のファイルを取得または設定します。
         /// </summary>
-        public ReactivePropertySlim<DsvFileInfo?> EditingFile { get; }
+        public ReactivePropertySlim<TableFileInfo?> EditingFile { get; }
 
         /// <summary>
         /// 表示データを取得または設定します。
@@ -82,9 +83,10 @@ namespace TextProcessor.ViewModels
         /// <summary>
         /// <see cref="EditViewModel"/>の新しいインスタンスを初期化します。
         /// </summary>
-        public EditViewModel(NavigationManager navigationManager, MainModel mainModel, EditModel editModel, NotificationService notificationService)
+        public EditViewModel(NavigationManager navigationManager, DialogService dialogService, MainModel mainModel, EditModel editModel, NotificationService notificationService)
             : base(navigationManager)
         {
+            this.dialogService = dialogService;
             this.mainModel = mainModel;
             this.editModel = editModel;
             this.notificationService = notificationService;
@@ -94,7 +96,7 @@ namespace TextProcessor.ViewModels
                                    .AddTo(DisposableList);
             LogTableCollapsed = editModel.SendLogNotification.ToReactivePropertySlimAsSynchronized(x => x.Value)
                                                              .AddTo(DisposableList);
-            EditingFile = new ReactivePropertySlim<DsvFileInfo?>(mainModel.CurrentEditData.Value).AddTo(DisposableList);
+            EditingFile = new ReactivePropertySlim<TableFileInfo?>(mainModel.CurrentEditData.Value).AddTo(DisposableList);
             ViewData = new ReactivePropertySlim<TextData?>().AddTo(DisposableList);
             EditingFile.Subscribe(OnSelectionChanged).AddTo(DisposableList);
             LogList = editModel.LogList.ToReadOnlyReactiveCollection()
@@ -184,9 +186,9 @@ namespace TextProcessor.ViewModels
         /// 編集ファイルが変更されたときに通知されます。
         /// </summary>
         /// <param name="value">変更後の値</param>
-        private void OnSelectionChanged(DsvFileInfo? value)
+        private void OnSelectionChanged(TableFileInfo? value)
         {
-            DsvFileInfo? old = mainModel.CurrentEditData.Value;
+            TableFileInfo? old = mainModel.CurrentEditData.Value;
             mainModel.CurrentEditData.Value = value;
 
             if (old is not null)
@@ -239,6 +241,18 @@ namespace TextProcessor.ViewModels
         /// </summary>
         private async Task Download()
         {
+            var options = new DialogOptions()
+            {
+                Width = "40vw",
+                Height = "25rem",
+            };
+            var parameters = new Dictionary<string, object>(StringComparer.Ordinal)
+            {
+                [nameof(Shared.Download.FileData)] = EditingFile.Value!,
+            };
+            DownloadViewModel? vm = await dialogService.OpenAsync<Shared.Download>("ダウンロード", parameters, options);
+            if (vm is null) return;
+
             TextData? data = ExecuteAllOperations();
             if (data is null)
             {
@@ -247,33 +261,73 @@ namespace TextProcessor.ViewModels
             }
 
             ViewData.Value = data;
-
             Stream? stream = null;
+            string fileName;
             try
             {
                 stream = new MemoryStream(1024 * 1024 * 16); // 16 MB
-                using (var writer = new StreamWriter(stream, leaveOpen: true))
+
+                switch (vm.FileType.Value)
                 {
-                    await data.WriteToAsync(writer, new TextSaveOptions("\t"));
+                    case TableFileType.Dsv:
+                        {
+                            fileName = EditingFile.Value!.Name;
+                            using (var writer = new StreamWriter(stream, leaveOpen: true))
+                            {
+                                await data.WriteToAsync(writer, new TextSaveOptions("\t"));
+                            }
+                            stream.Position = 0;
+                        }
+                        break;
+
+                    case TableFileType.Excel:
+                        {
+                            fileName = EditingFile.Value!.Name;
+                            string sheetName = EditingFile.Value!.Name;
+                            if (sheetName.Contains('/'))
+                            {
+                                string[] names = sheetName.Split('/');
+                                fileName = names[0];
+                                sheetName = names[1];
+                            }
+                            if (!fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase)
+                                && !fileName.EndsWith(".xlsm", StringComparison.OrdinalIgnoreCase))
+                                fileName = Path.ChangeExtension(fileName, ".xlsx");
+
+                            await Task.Run(() => data.SaveAsExcel(stream, sheetName, new ExcelSaveOptions(vm.AsRowString.Value)));
+                            stream.Position = 0;
+                        }
+                        break;
+
+                    default:
+                        notificationService.Notify(NotificationSeverity.Error, "ファイルのフォーマット指定が無効です");
+                        return;
                 }
-                stream.Position = 0;
             }
             catch
             {
+#if DEBUG
+                throw;
+#else
                 notificationService.Notify(NotificationSeverity.Error, "ファイル生成時にエラーが発生しました");
                 stream?.Dispose();
                 return;
+#endif
             }
 
-            await mainModel.DownloadFile(EditingFile.Value!.Name, stream);
             try
             {
+                await mainModel.DownloadFile(fileName, stream);
             }
             catch
             {
+#if DEBUG
+                throw;
+#else
                 notificationService.Notify(NotificationSeverity.Error, "ダウンロード時にエラーが発生しました");
                 stream.Dispose();
                 return;
+#endif
             }
             stream.Dispose();
         }
@@ -284,7 +338,7 @@ namespace TextProcessor.ViewModels
         /// <param name="operation">削除する処理</param>
         public async Task RemoveOperation(OperationViewModel operation)
         {
-            DsvFileInfo? data = EditingFile.Value;
+            TableFileInfo? data = EditingFile.Value;
             if (data is null) return;
             Operations.RemoveOnScheduler(operation);
             data.Operations.Remove(operation.Operation);
@@ -355,7 +409,7 @@ namespace TextProcessor.ViewModels
                     new[] { "4", "Yamada", "16", },
                 });
                 data1.HasHeader = true;
-                var info1 = new DsvFileInfo("test1.tsv", data1);
+                var info1 = new TableFileInfo("test1.tsv", data1);
                 mainModel.Files.AddOnScheduler(info1);
                 var data2 = TextData.CreateFromRawData(new[]
                 {
@@ -366,7 +420,7 @@ namespace TextProcessor.ViewModels
                     new[] { "5", "Yokohama" },
                 });
                 data2.HasHeader = true;
-                var info2 = new DsvFileInfo("test2.tsv", data2);
+                var info2 = new TableFileInfo("test2.tsv", data2);
                 mainModel.Files.AddOnScheduler(info2);
                 EditingFile.Value = info1;
             }

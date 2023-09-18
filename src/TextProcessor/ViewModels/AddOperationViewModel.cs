@@ -66,7 +66,6 @@ namespace TextProcessor.ViewModels
         /// <summary>
         /// ダイアログを閉じて追加処理を中断します。
         /// </summary>
-        /// <returns></returns>
         private async Task Cancel()
         {
             dialogService.Close(null);

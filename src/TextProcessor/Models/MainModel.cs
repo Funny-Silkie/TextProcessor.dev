@@ -1,6 +1,7 @@
 ﻿using Microsoft.JSInterop;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using TextProcessor.Data;
@@ -20,12 +21,12 @@ namespace TextProcessor.Models
         /// <summary>
         /// ファイル一覧を取得します。
         /// </summary>
-        public ReactiveCollection<DsvFileInfo> Files { get; }
+        public ReactiveCollection<TableFileInfo> Files { get; }
 
         /// <summary>
         /// 直近に編集したデータを取得または設定します。
         /// </summary>
-        public ReactiveProperty<DsvFileInfo?> CurrentEditData { get; }
+        public ReactiveProperty<TableFileInfo?> CurrentEditData { get; }
 
         /// <summary>
         /// <see cref="MainModel"/>の新しいインスタンスを初期化します。
@@ -34,8 +35,8 @@ namespace TextProcessor.Models
         {
             this.js = js;
 
-            CurrentEditData = new ReactiveProperty<DsvFileInfo?>().AddTo(DisposableList);
-            Files = new ReactiveCollection<DsvFileInfo>().AddTo(DisposableList);
+            CurrentEditData = new ReactiveProperty<TableFileInfo?>().AddTo(DisposableList);
+            Files = new ReactiveCollection<TableFileInfo>().AddTo(DisposableList);
         }
 
         /// <summary>
@@ -45,11 +46,27 @@ namespace TextProcessor.Models
         /// <param name="stream">読み込むファイルのストリームオブジェクト</param>
         /// <param name="options">読み込むオプション</param>
         /// <returns>読み込んだファイル</returns>
-        public async Task LoadFile(string name, Stream stream, TextLoadOptions options)
+        public async Task LoadDsvFile(string name, Stream stream, TextLoadOptions options)
         {
-            var info = new DsvFileInfo(name, await TextData.CreateAsync(stream, options));
+            var info = new TableFileInfo(name, await TextData.CreateFromDsvAsync(stream, options));
             CurrentEditData.Value = info;
             Files.AddOnScheduler(info);
+        }
+
+        /// <summary>
+        /// Excelのファイルを読み込みます。
+        /// </summary>
+        /// <param name="name">ファイル名</param>
+        /// <param name="stream">読み込むファイルのストリームオブジェクト</param>
+        /// <param name="options">読み込むオプション</param>
+        /// <returns>読み込んだファイル</returns>
+        public async Task LoadExcelFile(string name, Stream stream, ExcelLoadOptions options)
+        {
+            (string sheetName, TextData data)[] data = await Task.Run(() => TextData.CreateFromExcel(stream, options));
+            if (data.Length == 0) return;
+            TableFileInfo[] converted = Array.ConvertAll(data, x => new TableFileInfo($"{name}/{x.sheetName}", x.data));
+            CurrentEditData.Value = converted[0];
+            Files.AddRangeOnScheduler(converted);
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClosedXML.Excel;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -57,7 +58,7 @@ namespace TextProcessor.Logics.Data
         }
 
         /// <summary>
-        /// ファイルを読み込んで<see cref="TextData"/>のインスタンスを生成します。
+        /// DSVファイルを読み込んで<see cref="TextData"/>のインスタンスを生成します。
         /// </summary>
         /// <param name="fileName">読み込むファイルパス</param>
         /// <param name="options">読み込み時のオプション</param>
@@ -70,21 +71,21 @@ namespace TextProcessor.Logics.Data
         /// <exception cref="IOException">I/Oエラーが発生した</exception>
         /// <exception cref="OutOfMemoryException">メモリ不足</exception>
         /// <exception cref="System.Text.RegularExpressions.RegexMatchTimeoutException">正規表現検索時にタイムアウトが発生</exception>
-        public static TextData Create(string fileName, TextLoadOptions options)
+        public static TextData CreateFromDsv(string fileName, TextLoadOptions options)
         {
             using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return Create(stream, options);
+            return CreateFromDsv(stream, options);
         }
 
-        /// <inheritdoc cref="Create(Stream, TextLoadOptions)"/>
-        public static async Task<TextData> CreateAsync(string fileName, TextLoadOptions options)
+        /// <inheritdoc cref="CreateFromDsv(Stream, TextLoadOptions)"/>
+        public static async Task<TextData> CreateFromDsvAsync(string fileName, TextLoadOptions options)
         {
             using var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            return await CreateAsync(stream, options);
+            return await CreateFromDsvAsync(stream, options);
         }
 
         /// <summary>
-        /// ストリームオブジェクトを読み込んで<see cref="TextData"/>のインスタンスを生成します。
+        /// DSVのストリームオブジェクトを読み込んで<see cref="TextData"/>のインスタンスを生成します。
         /// </summary>
         /// <param name="stream">読み込むストリームオブジェクト</param>
         /// <param name="options">読み込み時のオプション</param>
@@ -95,7 +96,7 @@ namespace TextProcessor.Logics.Data
         /// <exception cref="IOException">I/Oエラーが発生した</exception>
         /// <exception cref="OutOfMemoryException">メモリ不足</exception>
         /// <exception cref="System.Text.RegularExpressions.RegexMatchTimeoutException">正規表現検索時にタイムアウトが発生</exception>
-        public static TextData Create(Stream stream, TextLoadOptions options)
+        public static TextData CreateFromDsv(Stream stream, TextLoadOptions options)
         {
             ArgumentNullException.ThrowIfNull(stream);
             ArgumentNullException.ThrowIfNull(options);
@@ -116,11 +117,12 @@ namespace TextProcessor.Logics.Data
                 result.items.Add(values);
             }
 
+            result.FillBlanks();
             return result;
         }
 
-        /// <inheritdoc cref="Create(Stream, TextLoadOptions)"/>
-        public static async Task<TextData> CreateAsync(Stream stream, TextLoadOptions options)
+        /// <inheritdoc cref="CreateFromDsv(Stream, TextLoadOptions)"/>
+        public static async Task<TextData> CreateFromDsvAsync(Stream stream, TextLoadOptions options)
         {
             ArgumentNullException.ThrowIfNull(stream);
             ArgumentNullException.ThrowIfNull(options);
@@ -141,6 +143,61 @@ namespace TextProcessor.Logics.Data
                 result.items.Add(values);
             }
 
+            result.FillBlanks();
+            return result;
+        }
+
+        /// <summary>
+        /// Excelファイルのストリームオブジェクトを読み込んで<see cref="TextData"/>のインスタンスを生成します。
+        /// </summary>
+        /// <param name="stream">読み込むストリームオブジェクト</param>
+        /// <returns>Excelファイルを基に作成された<see cref="TextData"/>のインスタンス一覧</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="stream"/>または<paramref name="options"/>が<see langword="null"/></exception>
+        /// <exception cref="ArgumentException"><paramref name="stream"/>が読み取りをサポートしない</exception>
+        /// <exception cref="ObjectDisposedException"><paramref name="stream"/>が既に破棄されている</exception>
+        /// <exception cref="FileFormatException">ファイルのフォーマットが無効</exception>
+        /// <exception cref="IOException">I/Oエラーが発生した</exception>
+        public static (string sheetName, TextData data)[] CreateFromExcel(Stream stream, ExcelLoadOptions options)
+        {
+            ArgumentNullException.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(options);
+
+            using var workBook = new XLWorkbook(stream);
+            var result = new (string, TextData)[workBook.Worksheets.Count];
+            int resultIndex = 0;
+            foreach (IXLWorksheet workSheet in workBook.Worksheets)
+            {
+                var data = new List<List<string>>(workSheet.RowCount());
+                foreach (IXLRow row in workSheet.Rows())
+                {
+                    if (row.CellCount() == 0)
+                    {
+                        data.Add(new List<string>());
+                        continue;
+                    }
+                    IXLCells cells = row.CellsUsed();
+                    var list = new List<string>(row.CellCount());
+                    data.Add(list);
+                    int columnIndex = 0;
+                    foreach (IXLCell cell in cells)
+                    {
+                        while (cell.Address.ColumnNumber - 1 > columnIndex)
+                        {
+                            list.Add(string.Empty);
+                            columnIndex++;
+                        }
+                        list.Add(cell.Value.ToString());
+                        columnIndex++;
+                    }
+                }
+
+                var currentResult = new TextData(data)
+                {
+                    HasHeader = options.HasHeader,
+                };
+                currentResult.FillBlanks();
+                result[resultIndex++] = (workSheet.Name, currentResult);
+            }
             return result;
         }
 
@@ -174,6 +231,29 @@ namespace TextProcessor.Logics.Data
         }
 
         object ICloneable.Clone() => Clone();
+
+        /// <summary>
+        /// 空文字を挿入して列数を揃えます。
+        /// </summary>
+        public void FillBlanks()
+        {
+            if (RowCount > 0) return;
+            int columnCount = ColumnCount;
+            foreach (List<string> row in items)
+            {
+                if (row.Count >= columnCount) continue;
+
+                if (columnCount - row.Count == 1)
+                {
+                    row.Add(string.Empty);
+                    continue;
+                }
+                var array = new string[columnCount - row.Count];
+
+                Array.Fill(array, string.Empty);
+                row.AddRange(array);
+            }
+        }
 
         /// <summary>
         /// <see cref="items"/>を取得します。
@@ -221,15 +301,14 @@ namespace TextProcessor.Logics.Data
         }
 
         /// <summary>
-        /// ファイルを出力します。
+        /// DSVファイルを出力します。
         /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="options"></param>
+        /// <param name="writer">出力先</param>
+        /// <param name="options">出力オプション</param>
         /// <exception cref="ArgumentNullException"><paramref name="writer"/>または<paramref name="options"/>が<see langword="null"/></exception>
-        /// <exception cref="ArgumentException"><paramref name="writer"/>が空文字</exception>
         /// <exception cref="ObjectDisposedException"><paramref name="writer"/>が既に破棄されている</exception>
         /// <exception cref="IOException">I/Oエラーが発生した</exception>
-        public void WriteTo(TextWriter writer, TextSaveOptions options)
+        public void SaveAsDsv(TextWriter writer, TextSaveOptions options)
         {
             ArgumentNullException.ThrowIfNull(writer);
             ArgumentNullException.ThrowIfNull(options);
@@ -238,15 +317,7 @@ namespace TextProcessor.Logics.Data
             foreach (List<string> row in items) logic.WriteRow(writer, row, "\t");
         }
 
-        /// <summary>
-        /// ファイルを出力します。
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="options"></param>
-        /// <exception cref="ArgumentNullException"><paramref name="writer"/>または<paramref name="options"/>が<see langword="null"/></exception>
-        /// <exception cref="ArgumentException"><paramref name="writer"/>が空文字</exception>
-        /// <exception cref="ObjectDisposedException"><paramref name="writer"/>が既に破棄されている</exception>
-        /// <exception cref="IOException">I/Oエラーが発生した</exception>
+        /// <inheritdoc cref="SaveAsDsv(TextWriter, TextSaveOptions)"/>
         public async Task WriteToAsync(TextWriter writer, TextSaveOptions options)
         {
             ArgumentNullException.ThrowIfNull(writer);
@@ -254,6 +325,55 @@ namespace TextProcessor.Logics.Data
 
             var logic = new DsvLogic();
             foreach (List<string> row in items) await logic.WriteRowAsync(writer, row, "\t");
+        }
+
+        /// <summary>
+        /// Excelのファイルを出力します。
+        /// </summary>
+        /// <param name="stream">出力先</param>
+        /// <param name="sheetName">ワークシート名</param>
+        /// <param name="options">保存時のオプション</param>
+        /// <exception cref="ArgumentNullException"><paramref name="stream"/>または<paramref name="options"/>が<see langword="null"/></exception>
+        /// <exception cref="ObjectDisposedException"><paramref name="stream"/>が既に破棄されている</exception>
+        /// <exception cref="IOException">I/Oエラーが発生した</exception>
+        public void SaveAsExcel(Stream stream, string? sheetName, ExcelSaveOptions options)
+        {
+            ArgumentNullException.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(options);
+
+            using var workBook = new XLWorkbook();
+            IXLWorksheet workSheet = string.IsNullOrEmpty(sheetName) ? workBook.AddWorksheet() : workBook.AddWorksheet(sheetName);
+            for (int rowIndex = 0; rowIndex < items.Count; rowIndex++)
+            {
+                List<string> listRow = items[rowIndex];
+                IXLRow excelRow = workSheet.Row(rowIndex + 1);
+                for (int columnIndex = 0; columnIndex < listRow.Count; columnIndex++)
+                {
+                    string value = listRow[columnIndex];
+                    IXLCell cell = excelRow.Cell(columnIndex + 1);
+                    if (string.IsNullOrEmpty(value)) cell.SetValue(Blank.Value);
+                    else
+                    {
+                        if (options.SaveAsRawString) cell.SetValue(value);
+                        else cell.SetValue(CreateCellValue(value));
+                    }
+                }
+            }
+
+            workBook.SaveAs(stream, new SaveOptions());
+
+            static XLCellValue CreateCellValue(string value)
+            {
+                if (long.TryParse(value, out long vl)) return vl;
+                if (double.TryParse(value, out double vd))
+                {
+                    if (double.IsNaN(vd) || double.IsInfinity(vd)) return value;
+                    return vd;
+                }
+                if (DateTime.TryParse(value, out DateTime vdt)) return vdt;
+                if (TimeSpan.TryParse(value, out TimeSpan vts)) return vts;
+                return value;
+            }
         }
     }
 }

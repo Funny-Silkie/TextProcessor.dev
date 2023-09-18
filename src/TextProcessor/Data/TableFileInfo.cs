@@ -7,7 +7,7 @@ namespace TextProcessor.Data
     /// <summary>
     /// DSVファイルの内容を表します。
     /// </summary>
-    public class DsvFileInfo
+    public class TableFileInfo
     {
         /// <summary>
         /// ファイル名を取得します。
@@ -25,11 +25,11 @@ namespace TextProcessor.Data
         public List<Operation> Operations { get; } = new List<Operation>();
 
         /// <summary>
-        /// <see cref="DsvFileInfo"/>の新しいインスタンスを初期化します。
+        /// <see cref="TableFileInfo"/>の新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="name">ファイル名</param>
         /// <param name="data">テーブルデータ</param>
-        public DsvFileInfo(string name, TextData data)
+        public TableFileInfo(string name, TextData data)
         {
             Name = name;
             Data = data;

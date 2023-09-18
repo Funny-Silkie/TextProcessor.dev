@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace TextProcessor.Logics.Operations
 {
@@ -73,5 +73,10 @@ namespace TextProcessor.Logics.Operations
         /// 可変長配列（<see cref="System.Collections.IList"/>）
         /// </summary>
         List = 1 << 12,
+
+        /// <summary>
+        /// 値の変換
+        /// </summary>
+        ValueConversion = 1 << 13,
     }
 }

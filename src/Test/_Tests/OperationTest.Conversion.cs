@@ -1,5 +1,6 @@
 ﻿using TextProcessor.Logics.Data;
 using TextProcessor.Logics.Operations;
+using TextProcessor.Logics.Operations.Conversions;
 using TextProcessor.Logics.Operations.OperationImpl;
 
 namespace Test
@@ -113,6 +114,58 @@ namespace Test
 
             ProcessStatus argResult = operation.VerifyArguments();
             Assert.That(argResult.Success, Is.False);
+        }
+
+        /// <summary>
+        /// <see cref="GenerateColumnOperation"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void GenerateColumn()
+        {
+            MultiplyValueConversion<long> conversion = ValueConversionFactory.MultiplyAsInteger();
+            conversion.Target = 2;
+
+            var operation = new GenerateColumnOperation()
+            {
+                Conversion = conversion,
+                HeaderName = "New",
+                InsertIndex = 3,
+                SourceIndex = 0,
+            };
+
+            ProcessStatus argResult = operation.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            TextData data = PrefectureTable;
+            ProcessStatus opResult = operation.Operate(data);
+
+            Assert.That(opResult.Success, Is.True);
+            CheckTextDataEquality(data, LoadResultData());
+        }
+
+        /// <summary>
+        /// <see cref="EditColumnOperation"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void EditColumn()
+        {
+            MultiplyValueConversion<long> conversion = ValueConversionFactory.MultiplyAsInteger();
+            conversion.Target = 2;
+
+            var operation = new EditColumnOperation()
+            {
+                Conversion = conversion,
+                SourceIndex = 0,
+            };
+
+            ProcessStatus argResult = operation.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            TextData data = PrefectureTable;
+            ProcessStatus opResult = operation.Operate(data);
+
+            Assert.That(opResult.Success, Is.True);
+            CheckTextDataEquality(data, LoadResultData());
         }
     }
 }

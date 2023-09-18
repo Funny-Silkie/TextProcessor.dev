@@ -62,6 +62,8 @@ namespace TextProcessor.Logics.Operations
                 new FullOuterJoinOperation(),
                 new DeleteColumnOperation(),
                 new DeleteRowOperation(),
+                new GenerateColumnOperation(),
+                new EditColumnOperation(),
             };
         }
 
@@ -107,6 +109,7 @@ namespace TextProcessor.Logics.Operations
             ArgumentNullException.ThrowIfNull(data);
             var result = new ProcessStatus();
             OperateCore(data, result);
+            data.FillBlanks();
             return result;
         }
 
