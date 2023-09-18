@@ -5,6 +5,7 @@ using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using TextProcessor.Data;
@@ -173,6 +174,11 @@ namespace TextProcessor.ViewModels
             try
             {
                 await loadModel.Load(file);
+            }
+            catch (FileFormatException)
+            {
+                notificationService.Notify(NotificationSeverity.Error, "ファイルのフォーマットが無効です");
+                return;
             }
             catch
             {

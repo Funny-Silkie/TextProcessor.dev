@@ -155,6 +155,7 @@ namespace TextProcessor.Logics.Data
         /// <exception cref="ArgumentNullException"><paramref name="stream"/>または<paramref name="options"/>が<see langword="null"/></exception>
         /// <exception cref="ArgumentException"><paramref name="stream"/>が読み取りをサポートしない</exception>
         /// <exception cref="ObjectDisposedException"><paramref name="stream"/>が既に破棄されている</exception>
+        /// <exception cref="FileFormatException">ファイルのフォーマットが無効</exception>
         /// <exception cref="IOException">I/Oエラーが発生した</exception>
         public static (string sheetName, TextData data)[] CreateFromExcel(Stream stream, ExcelLoadOptions options)
         {
