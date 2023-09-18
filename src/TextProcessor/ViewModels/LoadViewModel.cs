@@ -83,9 +83,14 @@ namespace TextProcessor.ViewModels
         public AsyncReactiveCommand<IBrowserFile?> OnFileChangedCommand { get; }
 
         /// <summary>
-        /// <inheritdoc cref="Load(InputFileChangeEventArgs)"/>
+        /// <inheritdoc cref="Load()"/>
         /// </summary>
         public AsyncReactiveCommand LoadCommand { get; }
+
+        /// <summary>
+        /// <inheritdoc cref="LoadAndEdit()"/>
+        /// </summary>
+        public AsyncReactiveCommand LoadAndEditCommand { get; }
 
         #endregion Commands
 
@@ -121,6 +126,8 @@ namespace TextProcessor.ViewModels
                                                                             .AddTo(DisposableList);
             LoadCommand = new AsyncReactiveCommand().WithSubscribe(Load)
                                                     .AddTo(DisposableList);
+            LoadAndEditCommand = new AsyncReactiveCommand().WithSubscribe(LoadAndEdit)
+                                                           .AddTo(DisposableList);
         }
 
         /// <summary>
@@ -149,6 +156,24 @@ namespace TextProcessor.ViewModels
         /// ファイルを読み込みます。
         /// </summary>
         private async Task Load()
+        {
+            await LoadCore();
+            CurrentFile.Value = null;
+        }
+
+        /// <summary>
+        /// ファイルを読み込んで編集画面に遷移します。
+        /// </summary>
+        private async Task LoadAndEdit()
+        {
+            await LoadCore();
+            NavigateTo("edit");
+        }
+
+        /// <summary>
+        /// ファイルを読み込みます。
+        /// </summary>
+        private async Task LoadCore()
         {
             IBrowserFile? file = CurrentFile.Value;
             if (file is null) return;
@@ -193,7 +218,6 @@ namespace TextProcessor.ViewModels
             {
                 dialogService.Close();
             }
-            NavigateTo("edit");
         }
     }
 }

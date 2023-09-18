@@ -42,7 +42,10 @@
             <RadzenLabel Component="Dropdown_Encoding" Text="文字エンコード" />
         </div>
     }
-    <RadzenButton Disabled="ViewModel.CurrentFile.Value is null" Text="読み込み" Click="ViewModel.LoadCommand.ToAsyncDelegate()" Style="width: 100px" />
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenButton Disabled="ViewModel.CurrentFile.Value is null" Text="読込・編集" Click="ViewModel.LoadAndEditCommand.ToAsyncDelegate()" Style="width: 150px" />
+        <RadzenButton Disabled="ViewModel.CurrentFile.Value is null" Text="読込" Click="ViewModel.LoadCommand.ToAsyncDelegate()" Style="width: 100px" ButtonStyle="ButtonStyle.Success" />
+    </RadzenStack>
 </RadzenStack>
 
 @code {
