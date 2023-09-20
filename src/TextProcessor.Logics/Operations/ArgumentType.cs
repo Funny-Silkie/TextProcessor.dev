@@ -78,5 +78,10 @@ namespace TextProcessor.Logics.Operations
         /// 値の変換
         /// </summary>
         ValueConversion = 1 << 13,
+
+        /// <summary>
+        /// 日付
+        /// </summary>
+        DateOnly = 1 << 14,
     }
 }

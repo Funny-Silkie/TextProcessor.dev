@@ -111,6 +111,7 @@ namespace TextProcessor.Logics.Operations
                 ArgumentType.TextData => null,
                 ArgumentType.ValueConversion => ValueConversion.Through,
                 ArgumentType.Arguments => this.GetCtor().Invoke(),
+                ArgumentType.DateOnly => DateOnly.FromDateTime(DateTime.Now),
                 _ => throw new NotSupportedException(),
             };
         }

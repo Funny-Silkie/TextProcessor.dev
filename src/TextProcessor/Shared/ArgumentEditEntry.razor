@@ -48,6 +48,9 @@
     case ArgumentType.ValueConversion:
         <ConditionEdit TValue="ValueConversion" Name="@(ComponentName)" Value="@(Getter.Invoke())" ValueChanged="x => Setter.Invoke(x)" />
         break;
+    case ArgumentType.DateOnly:
+        <RadzenDatePicker TValue="DateTime" DateFormat="yyyy/MM/dd" Name="@(ComponentName)" Value="((DateOnly)Getter.Invoke()).ToDateTime(new TimeOnly(0))" ValueChanged="x => Setter.Invoke(DateOnly.FromDateTime(x))" />
+        break;
 }
 @code {
     /// <summary>
