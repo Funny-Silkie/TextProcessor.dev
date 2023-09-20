@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace TextProcessor.Logics.Operations.Conversions
@@ -135,7 +135,7 @@ namespace TextProcessor.Logics.Operations.Conversions
         public string Value { get; set; } = string.Empty;
 
         /// <inheritdoc/>
-        public override string? Title => "上書き";
+        public override string? Title => "固定値";
 
         /// <inheritdoc/>
         protected override IList<ArgumentInfo> GenerateArguments()
@@ -170,7 +170,7 @@ namespace TextProcessor.Logics.Operations.Conversions
         /// <summary>
         /// 切り出す長さを取得または設定します。
         /// </summary>
-        public int Length { get; set; }
+        public int Length { get; set; } = 1;
 
         /// <inheritdoc/>
         protected override IList<ArgumentInfo> GenerateArguments()
@@ -178,7 +178,7 @@ namespace TextProcessor.Logics.Operations.Conversions
             return new[]
             {
                 new ArgumentInfo(ArgumentType.Integer, "開始インデックス", () => StartIndex, x => StartIndex = x),
-                new ArgumentInfo(ArgumentType.Index, "切り出す長さ", () =>  Length, x => Length = x),
+                new ArgumentInfo(ArgumentType.Integer, "切り出す長さ", () =>  Length, x => Length = x),
             };
         }
 
@@ -186,6 +186,7 @@ namespace TextProcessor.Logics.Operations.Conversions
         protected override void VerifyArgumentsCore(ProcessStatus status)
         {
             if (StartIndex < 0) status.Errors.Add(new StatusEntry(Title, Arguments[0], "開始インデックスが負の値です"));
+            if (Length < 0) status.Errors.Add(new StatusEntry(Title, Arguments[1], "開始インデックスが負の値です"));
         }
 
         /// <inheritdoc/>
