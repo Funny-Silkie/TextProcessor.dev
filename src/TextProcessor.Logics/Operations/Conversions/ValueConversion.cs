@@ -74,6 +74,8 @@ namespace TextProcessor.Logics.Operations.Conversions
                 new InsertValueConversion(),
                 new OverwriteValueConversion(),
                 new RangeValueConversion(),
+                new ToUpperValueConversion(),
+                new ToLowerValueConversion(),
                 ValueConversionFactory.AddAsInteger(),
                 ValueConversionFactory.SubtractAsInteger(),
                 ValueConversionFactory.MultiplyAsInteger(),

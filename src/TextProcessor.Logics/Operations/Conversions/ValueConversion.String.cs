@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace TextProcessor.Logics.Operations.Conversions
@@ -194,6 +194,38 @@ namespace TextProcessor.Logics.Operations.Conversions
         {
             if (StartIndex + Length >= value.Length) return value;
             return value.Substring(StartIndex, Length);
+        }
+    }
+
+    /// <summary>
+    /// 大文字への変換を表します。
+    /// </summary>
+    [Serializable]
+    internal sealed class ToUpperValueConversion : ValueConversion
+    {
+        /// <inheritdoc/>
+        public override string? Title => "大文字に変換";
+
+        /// <inheritdoc/>
+        protected override string? ConvertCore(string value, ProcessStatus status)
+        {
+            return value.ToUpper();
+        }
+    }
+
+    /// <summary>
+    /// 小文字への変換を表します。
+    /// </summary>
+    [Serializable]
+    internal sealed class ToLowerValueConversion : ValueConversion
+    {
+        /// <inheritdoc/>
+        public override string? Title => "小文字に変換";
+
+        /// <inheritdoc/>
+        protected override string? ConvertCore(string value, ProcessStatus status)
+        {
+            return value.ToLower();
         }
     }
 }
