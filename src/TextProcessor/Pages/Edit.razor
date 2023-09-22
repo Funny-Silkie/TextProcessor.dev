@@ -49,12 +49,7 @@
     /// </summary>
     private async Task OpenAddOperationDialog()
     {
-        var options = new DialogOptions()
-            {
-                Width = "50vw",
-                Height = "70vh",
-            };
-        AddOperationViewModel? vm = await DialogService.OpenAsync<AddOperation>("処理の追加", null, options);
+        AddOperationViewModel? vm = await DialogService.OpenAddOperationAsync();
 
         if (vm is null) return;
         await ViewModel.EndAddOperationCommand.ExecuteAsync(vm);

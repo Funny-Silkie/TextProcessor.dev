@@ -241,16 +241,7 @@ namespace TextProcessor.ViewModels
         /// </summary>
         private async Task Download()
         {
-            var options = new DialogOptions()
-            {
-                Width = "40vw",
-                Height = "25rem",
-            };
-            var parameters = new Dictionary<string, object>(StringComparer.Ordinal)
-            {
-                [nameof(Shared.Download.FileData)] = EditingFile.Value!,
-            };
-            DownloadViewModel? vm = await dialogService.OpenAsync<Shared.Download>("ダウンロード", parameters, options);
+            DownloadViewModel? vm = await dialogService.OpenDownloadAsync(EditingFile.Value);
             if (vm is null) return;
 
             TextData? data = ExecuteAllOperations();

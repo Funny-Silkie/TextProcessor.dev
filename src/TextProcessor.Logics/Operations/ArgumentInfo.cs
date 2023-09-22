@@ -78,17 +78,17 @@ namespace TextProcessor.Logics.Operations
         /// </summary>
         /// <param name="type">引数の種類</param>
         /// <param name="name">名前</param>
-        /// <param name="gettter">ゲッター関数</param>
+        /// <param name="getter">ゲッター関数</param>
         /// <param name="setter">セッター関数</param>
-        /// <exception cref="ArgumentNullException"><paramref name="gettter"/>または<paramref name="setter"/>が<see langword="null"/></exception>
-        public ArgumentInfo(ArgumentType type, string? name, Func<dynamic> gettter, Action<dynamic> setter)
+        /// <exception cref="ArgumentNullException"><paramref name="getter"/>または<paramref name="setter"/>が<see langword="null"/></exception>
+        public ArgumentInfo(ArgumentType type, string? name, Func<dynamic> getter, Action<dynamic> setter)
         {
-            ArgumentNullException.ThrowIfNull(gettter);
+            ArgumentNullException.ThrowIfNull(getter);
             ArgumentNullException.ThrowIfNull(setter);
 
             Type = type;
             Name = name;
-            Getter = gettter;
+            Getter = getter;
             Setter = setter;
         }
 
