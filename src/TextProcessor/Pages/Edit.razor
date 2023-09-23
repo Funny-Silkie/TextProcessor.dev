@@ -34,7 +34,7 @@
             }
         </RadzenSplitterPane>
         <RadzenSplitterPane @ref="logSplitterPane" Size="300px" Collapsed="ViewModel.LogTableCollapsed.Value">
-            <LogTable Style="max-height: calc(100vh - 75px); padding-left: 5px" Data="ViewModel.LogList" />
+            <LogTable Style="max-height: calc(100vh - 75px); padding-left: 5px" ViewModel="ViewModel.LogListViewModel" />
         </RadzenSplitterPane>
     </RadzenSplitter>
 </RadzenStack>

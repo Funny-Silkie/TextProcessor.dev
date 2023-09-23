@@ -1,4 +1,6 @@
-﻿namespace TextProcessor.Data
+﻿using System.ComponentModel;
+
+namespace TextProcessor.Data
 {
     /// <summary>
     /// ログ情報を表します。
@@ -6,5 +8,9 @@
     /// <param name="Type">ログの種類</param>
     /// <param name="Message">メッセージ</param>
     /// <param name="Target">ターゲット</param>
-    public sealed record class LogInfo(LogType Type, string? Message, string? Target);
+    public sealed record class LogInfo(LogType Type, string? Message, string? Target) : INotifyPropertyChanged
+    {
+        /// <inheritdoc/>
+        public event PropertyChangedEventHandler? PropertyChanged;
+    }
 }
