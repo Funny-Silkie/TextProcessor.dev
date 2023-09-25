@@ -2,6 +2,8 @@
 using Reactive.Bindings.Extensions;
 using Reactive.Bindings.Helpers;
 using System;
+using System.ComponentModel;
+using System.Reactive.Linq;
 using TextProcessor.Data;
 using TextProcessor.Models;
 
@@ -49,17 +51,25 @@ namespace TextProcessor.ViewModels
         /// </summary>
         public LogListViewModel(EditModel editModel)
         {
-            filterableLogList = editModel.LogList.ToFilteredReadOnlyObservableCollection(FilterMessage)
-                                                 .AddTo(DisposableList);
+            filterableLogList =
+                new FilteredReadOnlyObservableCollection<ReactiveCollection<LogInfo>, LogInfo, PropertyChangedEventArgs>(
+                    editModel.LogList,
+                    x => true,
+                    x => Observable.FromEvent<PropertyChangedEventHandler, PropertyChangedEventArgs>(
+                        y => (_, z) => y.Invoke(z),
+                        y => x.PropertyChanged += y,
+                        y => x.PropertyChanged -= y
+                    )
+                ).AddTo(DisposableList);
             LogList = filterableLogList.ToReadOnlyReactiveCollection()
                                        .AddTo(DisposableList);
-            ShowInfo = new ReactivePropertySlim<bool>(true).AddTo(DisposableList);
+            ShowInfo = new ReactivePropertySlim<bool>(true, ReactivePropertyMode.DistinctUntilChanged).AddTo(DisposableList);
             ShowInfo.Subscribe(UpdateFilter);
-            ShowWarning = new ReactivePropertySlim<bool>(true).AddTo(DisposableList);
+            ShowWarning = new ReactivePropertySlim<bool>(true, ReactivePropertyMode.DistinctUntilChanged).AddTo(DisposableList);
             ShowWarning.Subscribe(UpdateFilter);
-            ShowError = new ReactivePropertySlim<bool>(true).AddTo(DisposableList);
+            ShowError = new ReactivePropertySlim<bool>(true, ReactivePropertyMode.DistinctUntilChanged).AddTo(DisposableList);
             ShowError.Subscribe(UpdateFilter);
-            ShowSuccess = new ReactivePropertySlim<bool>(true).AddTo(DisposableList);
+            ShowSuccess = new ReactivePropertySlim<bool>(true, ReactivePropertyMode.DistinctUntilChanged).AddTo(DisposableList);
             ShowSuccess.Subscribe(UpdateFilter);
         }
 
