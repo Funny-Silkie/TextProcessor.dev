@@ -8,7 +8,7 @@
         <RadzenLabel Component="DropDown_SelectedFile" Text="編集するファイル" />
     </div>
     <RadzenSplitter Style="width: calc(100vw - 320px)" Collapse="UpdateLogCollapsed" Expand="UpdateLogCollapsed">
-        <RadzenSplitterPane Style="height: calc(100vh - 75px)" Size="500px">
+        <RadzenSplitterPane Style="@($"height: {heightCss}")" Size="500px">
             <RadzenStack Orientation="Orientation.Vertical" Gap="0" JustifyContent="JustifyContent.End" Style="height: 100%">
                 <OperationList Style="height: 100%; background-color: lightgray; overflow: auto; padding-left: 5px; padding-top: 5px; padding-right: 5px" Source="ViewModel.Operations" />
                 <RadzenStack Style="padding: 1rem" Orientation="Orientation.Horizontal" Gap="1rem">
@@ -22,7 +22,7 @@
         <RadzenSplitterPane Size="calc(100% - 800px)">
             @if (ViewModel.ViewData.Value is not null)
             {
-                <DsvView @ref="dsvView" Style="max-height: calc(100vh - 75px)" Data="ViewModel.ViewData.Value" />
+                <DsvView @ref="dsvView" Style="@($"max-height: {heightCss}")" Data="ViewModel.ViewData.Value" />
             }
             else if (ViewModel.Files.Count > 0)
             {
@@ -34,12 +34,14 @@
             }
         </RadzenSplitterPane>
         <RadzenSplitterPane @ref="logSplitterPane" Size="300px" Collapsed="ViewModel.LogTableCollapsed.Value">
-            <LogTable Style="max-height: calc(100vh - 75px); padding-left: 5px" ViewModel="ViewModel.LogListViewModel" />
+            <LogTable Style="@($"max-height: {heightCss}; padding-left: 5px")" ViewModel="ViewModel.LogListViewModel" />
         </RadzenSplitterPane>
     </RadzenSplitter>
 </RadzenStack>
 
 @code {
+    private const string heightCss = "calc(100vh - 75px)";
+
     private DsvView dsvView = default!;
     private bool isInOpeartionProgress;
     private RadzenSplitterPane? logSplitterPane;
