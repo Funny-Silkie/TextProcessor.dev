@@ -51,6 +51,12 @@
     case ArgumentType.DateOnly:
         <RadzenDatePicker TValue="DateTime" DateFormat="yyyy/MM/dd" Name="@(ComponentName)" Value="((DateOnly)Getter.Invoke()).ToDateTime(new TimeOnly(0))" ValueChanged="x => Setter.Invoke(DateOnly.FromDateTime(x))" />
         break;
+    case ArgumentType.Range0Based:
+        <RadzenTextBox Name="@(ComponentName)" Value="@(((ValueRange)Getter.Invoke()).ToString())" ValueChanged="@(x =>{ if (ValueRange.TryParse(x, out ValueRange value)) Setter.Invoke(value); })" />
+        break;
+    case ArgumentType.Range1Based:
+        <RadzenTextBox Name="@(ComponentName)" Value="@(new ValueRange(((ValueRange)Getter.Invoke()).Select(x => x + 1)).ToString())" ValueChanged="@(x =>{ if (ValueRange.TryParse(x, out ValueRange value)) Setter.Invoke(new ValueRange(value.Where(x => x > 0).Select(x => x - 1))); })" />
+        break;
 }
 @code {
     /// <summary>

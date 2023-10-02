@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TextProcessor.Logics.Data;
 
 namespace TextProcessor.Logics.Operations.OperationImpl
@@ -11,9 +12,9 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     internal class SelectColumnOperation : Operation
     {
         /// <summary>
-        /// 対象の列インデックスを取得または設定します。
+        /// 対象の列を取得または設定します。
         /// </summary>
-        public int ColumnIndex { get; set; }
+        public ValueRange Columns { get; set; }
 
         /// <inheritdoc/>
         public override string Title => "指定した列を抽出";
@@ -34,7 +35,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected SelectColumnOperation(SelectColumnOperation cloned)
             : base(cloned)
         {
-            ColumnIndex = cloned.ColumnIndex;
+            Columns = cloned.Columns;
         }
 
         /// <inheritdoc/>
@@ -45,7 +46,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Index, "列番号", () => ColumnIndex, x => ColumnIndex = x),
+                new ArgumentInfo(ArgumentType.Range1Based, "列番号", () => Columns, x => Columns = x),
             };
         }
 
@@ -58,22 +59,37 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
             List<List<string>> list = data.GetSourceData();
-            int failCount = 0;
+            var newList = new List<List<string>>(list.Count);
+
+            int columnCount = Columns.AsEntryCollection().Sum(x => x.Count);
+            if (columnCount == 0)
+            {
+                if (data.HasHeader)
+                {
+                    if (list.Count > 0) list.RemoveRange(1, list.Count - 1);
+                }
+                else list.Clear();
+                status.Warnings.Add(new StatusEntry(Title, null, "列が指定されていません"));
+                return;
+            }
 
             foreach (List<string> row in list)
             {
-                if (ColumnIndex >= row.Count)
+                var newRow = new List<string>(columnCount);
+                foreach (int index in Columns)
                 {
-                    failCount++;
-                    row.Clear();
-                    row.Add(string.Empty);
-                    continue;
+                    if (index >= row.Count)
+                    {
+                        newRow.Add(string.Empty);
+                        break;
+                    }
+                    newRow.Add(row[index]);
                 }
-                if (ColumnIndex < row.Count - 1) row.RemoveRange(ColumnIndex + 1, row.Count - ColumnIndex - 1);
-                row.RemoveRange(0, ColumnIndex);
+                newList.Add(newRow);
             }
 
-            if (failCount == list.Count) status.Warnings.Add(new StatusEntry(Title, null, "列番号が表の範囲外です"));
+            list.Clear();
+            list.AddRange(newList);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TextProcessor.Logics.Data;
 
 namespace TextProcessor.Logics.Operations.OperationImpl
@@ -11,9 +12,9 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     internal class DeleteColumnOperation : Operation
     {
         /// <summary>
-        /// 削除する列のインデックスを取得または設定します。
+        /// 削除する列を取得または設定します。
         /// </summary>
-        public int Index { get; set; }
+        public ValueRange Columns { get; set; }
 
         /// <inheritdoc/>
         public override string Title => "指定した列を削除";
@@ -34,7 +35,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected DeleteColumnOperation(DeleteColumnOperation cloned)
             : base(cloned)
         {
-            Index = cloned.Index;
+            Columns = cloned.Columns;
         }
 
         /// <inheritdoc/>
@@ -45,7 +46,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Index, "列番号", () => Index, x => Index = x),
+                new ArgumentInfo(ArgumentType.Range1Based, "列番号", () => Columns, x => Columns = x),
             };
         }
 
@@ -57,15 +58,30 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         /// <inheritdoc/>
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
-            int removedCount = 0;
+            HashSet<int> indexes = Columns.Distinct().ToHashSet();
+            List<List<string>> list = data.GetSourceData();
 
-            foreach (List<string> row in data.GetSourceData())
-                if (Index < row.Count)
+            bool nonRemoved = false;
+            for (int rowIndex = 0; rowIndex < list.Count; rowIndex++)
+            {
+                List<string> row = list[rowIndex];
+                int removedCount = 0;
+
+                var newRow = new List<string>(row.Count);
+                for (int columnIndex = 0; columnIndex < row.Count; columnIndex++)
                 {
-                    row.RemoveAt(Index);
-                    removedCount++;
+                    if (indexes.Contains(columnIndex))
+                    {
+                        removedCount++;
+                        continue;
+                    }
+                    newRow.Add(row[columnIndex]);
                 }
-            if (removedCount == 0) status.Warnings.Add(new StatusEntry(Title, null, $"列番号'{Index + 1}'の列が存在しません"));
+                if (removedCount == 0) nonRemoved = true;
+                else list[rowIndex] = newRow;
+            }
+
+            if (nonRemoved) status.Warnings.Add(new StatusEntry(Title, null, "削除された列がありません"));
         }
     }
 }

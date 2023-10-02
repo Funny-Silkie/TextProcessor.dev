@@ -334,7 +334,7 @@ namespace Test
         {
             var operation = new SelectColumnOperation()
             {
-                ColumnIndex = 2,
+                Columns = 2,
             };
 
             ProcessStatus argResult = operation.VerifyArguments();
@@ -355,7 +355,7 @@ namespace Test
         {
             var operation = new SelectColumnOperation()
             {
-                ColumnIndex = 100,
+                Columns = default,
             };
 
             ProcessStatus argResult = operation.VerifyArguments();
@@ -368,6 +368,27 @@ namespace Test
         }
 
         /// <summary>
+        /// <see cref="SelectColumnOperation"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void SelectColumn3()
+        {
+            var operation = new SelectColumnOperation()
+            {
+                Columns = new ValueRange(new[] { 0, 2, 0 }),
+            };
+
+            ProcessStatus argResult = operation.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            TextData data = PrefectureTable;
+            ProcessStatus opResult = operation.Operate(data);
+
+            Assert.That(opResult.Success, Is.True);
+            CheckTextDataEquality(data, LoadResultData());
+        }
+
+        /// <summary>
         /// <see cref="DeleteColumnOperation"/>のテストを行います。
         /// </summary>
         [Test]
@@ -375,7 +396,7 @@ namespace Test
         {
             var operation = new DeleteColumnOperation()
             {
-                Index = 1,
+                Columns = 1,
             };
 
             ProcessStatus argResult = operation.VerifyArguments();
@@ -396,7 +417,7 @@ namespace Test
         {
             var operation = new DeleteColumnOperation()
             {
-                Index = 100,
+                Columns = 100,
             };
 
             ProcessStatus argResult = operation.VerifyArguments();
@@ -411,6 +432,27 @@ namespace Test
         }
 
         /// <summary>
+        /// <see cref="DeleteColumnOperation"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void DeleteColumn3()
+        {
+            var operation = new DeleteColumnOperation()
+            {
+                Columns = ValueRange.Parse("0-1,3"),
+            };
+
+            ProcessStatus argResult = operation.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            TextData data = PrefectureTable;
+            ProcessStatus opResult = operation.Operate(data);
+
+            Assert.That(opResult.Success, Is.True);
+            CheckTextDataEquality(data, LoadResultData());
+        }
+
+        /// <summary>
         /// <see cref="DeleteRowOperation"/>のテストを行います。
         /// </summary>
         [Test]
@@ -418,7 +460,7 @@ namespace Test
         {
             var operation = new DeleteRowOperation()
             {
-                Index = 1,
+                Rows = 1,
             };
 
             ProcessStatus argResult = operation.VerifyArguments();
@@ -439,7 +481,7 @@ namespace Test
         {
             var operation = new DeleteRowOperation()
             {
-                Index = 100,
+                Rows = 100,
             };
 
             ProcessStatus argResult = operation.VerifyArguments();
@@ -451,6 +493,27 @@ namespace Test
 
             Assert.That(opResult.Success, Is.True);
             CheckTextDataEquality(data, comparison);
+        }
+
+        /// <summary>
+        /// <see cref="DeleteRowOperation"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void DeleteRow3()
+        {
+            var operation = new DeleteRowOperation()
+            {
+                Rows = ValueRange.Parse("10-19,30-39"),
+            };
+
+            ProcessStatus argResult = operation.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            TextData data = PrefectureTable;
+            ProcessStatus opResult = operation.Operate(data);
+
+            Assert.That(opResult.Success, Is.True);
+            CheckTextDataEquality(data, LoadResultData());
         }
     }
 }

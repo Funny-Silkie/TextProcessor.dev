@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TextProcessor.Logics.Data;
 using TextProcessor.Logics.Operations.Conditions;
 using TextProcessor.Logics.Operations.Conversions;
 
@@ -112,6 +113,8 @@ namespace TextProcessor.Logics.Operations
                 ArgumentType.ValueConversion => ValueConversion.Through,
                 ArgumentType.Arguments => this.GetCtor().Invoke(),
                 ArgumentType.DateOnly => DateOnly.FromDateTime(DateTime.Now),
+                ArgumentType.Range0Based => new ValueRange(0),
+                ArgumentType.Range1Based => new ValueRange(1),
                 _ => throw new NotSupportedException(),
             };
         }
