@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace TextProcessor.Logics.Operations.Conversions
 {
@@ -226,6 +228,103 @@ namespace TextProcessor.Logics.Operations.Conversions
         protected override string? ConvertCore(string value, ProcessStatus status)
         {
             return value.ToLower();
+        }
+    }
+
+    /// <summary>
+    /// 正規表現マッチ部分への変換を表します。
+    /// </summary>
+    [Serializable]
+    internal sealed class RegexMatchValueConversion : ValueConversion
+    {
+        /// <inheritdoc/>
+        public override string? Title => "正規表現マッチ部分の抽出";
+
+        /// <summary>
+        /// 正規表現パターンを取得または設定します。
+        /// </summary>
+        [StringSyntax(StringSyntaxAttribute.Regex)]
+        public string Pattern
+        {
+            get => _pattern;
+            set
+            {
+                if (string.Equals(_pattern, value, StringComparison.Ordinal)) return;
+                _pattern = value;
+                _regex = null;
+            }
+        }
+
+        [StringSyntax(StringSyntaxAttribute.Regex)]
+        private string _pattern = string.Empty;
+
+        /// <summary>
+        /// 正規表現オブジェクトを取得します。
+        /// </summary>
+        public Regex? Regex
+        {
+            get
+            {
+                if (_regex is null)
+                {
+                    var options = RegexOptions.Compiled;
+                    if (!CaseSensitive) options |= RegexOptions.IgnoreCase;
+                    try
+                    {
+                        _regex = new Regex(Pattern, options);
+                    }
+                    catch (Exception)
+                    {
+                        return null;
+                    }
+                }
+                return _regex;
+            }
+        }
+
+        [NonSerialized]
+        private Regex? _regex;
+
+        /// <summary>
+        /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
+        /// </summary>
+        public bool CaseSensitive
+        {
+            get => _caseSensitive;
+            set
+            {
+                if (_caseSensitive == value) return;
+                _caseSensitive = value;
+                _regex = null;
+            }
+        }
+
+        private bool _caseSensitive = true;
+
+        /// <inheritdoc/>
+        protected override IList<ArgumentInfo> GenerateArguments()
+        {
+            return new[]
+            {
+                new ArgumentInfo(ArgumentType.String, "正規表現パターン", () => Pattern, x => Pattern = x),
+                new ArgumentInfo(ArgumentType.Boolean, "大文字小文字の区別", () => CaseSensitive, x => CaseSensitive = x),
+            };
+        }
+
+        /// <inheritdoc/>
+        protected override void VerifyArgumentsCore(ProcessStatus status)
+        {
+            if (string.IsNullOrEmpty(Pattern)) status.Errors.Add(new StatusEntry(Title, Arguments[0], "正規表現パターンが指定されていません"));
+            if (Regex is null) status.Errors.Add(new StatusEntry(Title, Arguments[0], "正規表現が無効です"));
+        }
+
+        /// <inheritdoc/>
+        protected override string? ConvertCore(string value, ProcessStatus status)
+        {
+            if (Regex is null) return null;
+
+            Match regexResult = Regex.Match(value);
+            return regexResult.Value;
         }
     }
 }

@@ -194,7 +194,18 @@ namespace TextProcessor.Logics.Operations.Conditions
         /// <summary>
         /// 大文字小文字を区別するかどうかを表す値を取得または設定します。
         /// </summary>
-        public bool CaseSensitive { get; set; } = true;
+        public bool CaseSensitive
+        {
+            get => _caseSensitive;
+            set
+            {
+                if (_caseSensitive == value) return;
+                _caseSensitive = value;
+                _regex = null;
+            }
+        }
+
+        private bool _caseSensitive = true;
 
         /// <summary>
         /// 使用する正規表現オブジェクトを取得します。

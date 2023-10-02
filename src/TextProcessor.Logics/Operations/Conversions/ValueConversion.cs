@@ -76,6 +76,7 @@ namespace TextProcessor.Logics.Operations.Conversions
                 new RangeValueConversion(),
                 new ToUpperValueConversion(),
                 new ToLowerValueConversion(),
+                new RegexMatchValueConversion(),
                 ValueConversionFactory.AddAsInteger(),
                 ValueConversionFactory.SubtractAsInteger(),
                 ValueConversionFactory.MultiplyAsInteger(),
