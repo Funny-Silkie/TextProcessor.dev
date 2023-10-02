@@ -48,6 +48,15 @@
     case ArgumentType.ValueConversion:
         <ConditionEdit TValue="ValueConversion" Name="@(ComponentName)" Value="@(Getter.Invoke())" ValueChanged="x => Setter.Invoke(x)" />
         break;
+    case ArgumentType.DateOnly:
+        <RadzenDatePicker TValue="DateTime" DateFormat="yyyy/MM/dd" Name="@(ComponentName)" Value="((DateOnly)Getter.Invoke()).ToDateTime(new TimeOnly(0))" ValueChanged="x => Setter.Invoke(DateOnly.FromDateTime(x))" />
+        break;
+    case ArgumentType.Range0Based:
+        <RadzenTextBox Name="@(ComponentName)" Value="@(((ValueRange)Getter.Invoke()).ToString())" ValueChanged="@(x =>{ if (ValueRange.TryParse(x, out ValueRange value)) Setter.Invoke(value); })" Placeholder="0-3,6" />
+        break;
+    case ArgumentType.Range1Based:
+        <RadzenTextBox Name="@(ComponentName)" Value="@(new ValueRange(((ValueRange)Getter.Invoke()).Select(x => x + 1)).ToString())" ValueChanged="@(x =>{ if (ValueRange.TryParse(x, out ValueRange value)) Setter.Invoke(new ValueRange(value.Where(x => x > 0).Select(x => x - 1))); })" Placeholder="1-3,6" />
+        break;
 }
 @code {
     /// <summary>

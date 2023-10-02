@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TextProcessor.Logics.Data;
 using TextProcessor.Logics.Operations.Conditions;
 using TextProcessor.Logics.Operations.Conversions;
 
@@ -78,17 +79,17 @@ namespace TextProcessor.Logics.Operations
         /// </summary>
         /// <param name="type">引数の種類</param>
         /// <param name="name">名前</param>
-        /// <param name="gettter">ゲッター関数</param>
+        /// <param name="getter">ゲッター関数</param>
         /// <param name="setter">セッター関数</param>
-        /// <exception cref="ArgumentNullException"><paramref name="gettter"/>または<paramref name="setter"/>が<see langword="null"/></exception>
-        public ArgumentInfo(ArgumentType type, string? name, Func<dynamic> gettter, Action<dynamic> setter)
+        /// <exception cref="ArgumentNullException"><paramref name="getter"/>または<paramref name="setter"/>が<see langword="null"/></exception>
+        public ArgumentInfo(ArgumentType type, string? name, Func<dynamic> getter, Action<dynamic> setter)
         {
-            ArgumentNullException.ThrowIfNull(gettter);
+            ArgumentNullException.ThrowIfNull(getter);
             ArgumentNullException.ThrowIfNull(setter);
 
             Type = type;
             Name = name;
-            Getter = gettter;
+            Getter = getter;
             Setter = setter;
         }
 
@@ -111,6 +112,9 @@ namespace TextProcessor.Logics.Operations
                 ArgumentType.TextData => null,
                 ArgumentType.ValueConversion => ValueConversion.Through,
                 ArgumentType.Arguments => this.GetCtor().Invoke(),
+                ArgumentType.DateOnly => DateOnly.FromDateTime(DateTime.Now),
+                ArgumentType.Range0Based => new ValueRange(0),
+                ArgumentType.Range1Based => new ValueRange(1),
                 _ => throw new NotSupportedException(),
             };
         }

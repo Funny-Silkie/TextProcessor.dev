@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TextProcessor.Logics.Data;
 
 namespace TextProcessor.Logics.Operations.OperationImpl
@@ -11,9 +12,9 @@ namespace TextProcessor.Logics.Operations.OperationImpl
     internal class DeleteRowOperation : Operation
     {
         /// <summary>
-        /// 削除する行のインデックスを取得または設定します。
+        /// 削除する行を取得または設定します。
         /// </summary>
-        public int Index { get; set; }
+        public ValueRange Rows { get; set; }
 
         /// <inheritdoc/>
         public override string Title => "指定した行を削除";
@@ -34,7 +35,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected DeleteRowOperation(DeleteRowOperation cloned)
             : base(cloned)
         {
-            Index = cloned.Index;
+            Rows = cloned.Rows;
         }
 
         /// <inheritdoc/>
@@ -45,7 +46,7 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         {
             return new[]
             {
-                new ArgumentInfo(ArgumentType.Index, "行番号", () => Index, x => Index = x),
+                new ArgumentInfo(ArgumentType.Range1Based, "行番号", () => Rows, x => Rows = x),
             };
         }
 
@@ -58,10 +59,36 @@ namespace TextProcessor.Logics.Operations.OperationImpl
         protected override void OperateCore(TextData data, ProcessStatus status)
         {
             List<List<string>> list = data.GetSourceData();
-            int deletedIndex = Index;
-            if (data.HasHeader) deletedIndex++;
-            if (deletedIndex < list.Count) list.RemoveAt(deletedIndex);
-            else status.Warnings.Add(new StatusEntry(Title, null, $"行番号'{Index + 1}'の行は存在しません"));
+
+            IEnumerable<int> indexes = Rows.Distinct();
+            if (data.HasHeader) indexes = indexes.Select(x => x + 1);
+            HashSet<int> indexset = indexes.ToHashSet();
+            if (indexset.Count == 0)
+            {
+                status.Warnings.Add(new StatusEntry(Title, null, "削除する行が指定されていません"));
+                return;
+            }
+
+            var newList = new List<List<string>>(list.Count);
+            int removedCount = 0;
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (indexset.Contains(i))
+                {
+                    removedCount++;
+                    continue;
+                }
+
+                List<string> row = list[i];
+                newList.Add(row);
+            }
+
+            if (removedCount == 0) status.Warnings.Add(new StatusEntry(Title, null, "削除された行がありません"));
+            else
+            {
+                list.Clear();
+                list.AddRange(newList);
+            }
         }
     }
 }

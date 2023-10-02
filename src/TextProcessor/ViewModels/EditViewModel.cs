@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Radzen;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
+using Reactive.Bindings.Helpers;
 using Reactive.Bindings.Notifiers;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,11 @@ namespace TextProcessor.ViewModels
         private readonly NotificationService notificationService;
         private bool initialized;
 
+        /// <summary>
+        /// ログ一覧のViewModelのインスタンスを取得します。
+        /// </summary>
+        public LogListViewModel LogListViewModel { get; }
+
         #region Properties
 
         /// <summary>
@@ -51,11 +57,6 @@ namespace TextProcessor.ViewModels
         /// 処理一覧を取得します。
         /// </summary>
         public ReactiveCollection<OperationViewModel> Operations { get; }
-
-        /// <summary>
-        /// ログ一覧を取得します。
-        /// </summary>
-        public ReadOnlyReactiveCollection<LogInfo> LogList { get; }
 
         /// <summary>
         /// ログ一覧が閉じられているかどうかを取得または設定します。
@@ -83,13 +84,14 @@ namespace TextProcessor.ViewModels
         /// <summary>
         /// <see cref="EditViewModel"/>の新しいインスタンスを初期化します。
         /// </summary>
-        public EditViewModel(NavigationManager navigationManager, DialogService dialogService, MainModel mainModel, EditModel editModel, NotificationService notificationService)
+        public EditViewModel(NavigationManager navigationManager, DialogService dialogService, MainModel mainModel, EditModel editModel, NotificationService notificationService, LogListViewModel logListViewModel)
             : base(navigationManager)
         {
             this.dialogService = dialogService;
             this.mainModel = mainModel;
             this.editModel = editModel;
             this.notificationService = notificationService;
+            LogListViewModel = logListViewModel;
 
             Operations = new ReactiveCollection<OperationViewModel>().AddTo(DisposableList);
             Files = mainModel.Files.ToReadOnlyReactiveCollection()
@@ -99,8 +101,6 @@ namespace TextProcessor.ViewModels
             EditingFile = new ReactivePropertySlim<TableFileInfo?>(mainModel.CurrentEditData.Value).AddTo(DisposableList);
             ViewData = new ReactivePropertySlim<TextData?>().AddTo(DisposableList);
             EditingFile.Subscribe(OnSelectionChanged).AddTo(DisposableList);
-            LogList = editModel.LogList.ToReadOnlyReactiveCollection()
-                                       .AddTo(DisposableList);
 
             EndAddOperationCommand = new AsyncReactiveCommand<AddOperationViewModel>().WithSubscribe(EndAddOperation)
                                                                                       .AddTo(DisposableList);
@@ -241,16 +241,7 @@ namespace TextProcessor.ViewModels
         /// </summary>
         private async Task Download()
         {
-            var options = new DialogOptions()
-            {
-                Width = "40vw",
-                Height = "25rem",
-            };
-            var parameters = new Dictionary<string, object>(StringComparer.Ordinal)
-            {
-                [nameof(Shared.Download.FileData)] = EditingFile.Value!,
-            };
-            DownloadViewModel? vm = await dialogService.OpenAsync<Shared.Download>("ダウンロード", parameters, options);
+            DownloadViewModel? vm = await dialogService.OpenDownloadAsync(EditingFile.Value);
             if (vm is null) return;
 
             TextData? data = ExecuteAllOperations();

@@ -10,7 +10,6 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using TextProcessor.Data;
 using TextProcessor.Models;
-using TextProcessor.Shared;
 
 namespace TextProcessor.ViewModels
 {
@@ -184,17 +183,7 @@ namespace TextProcessor.ViewModels
                 return;
             }
 
-            dialogService.Open<WaitingDialog>(string.Empty, new Dictionary<string, object>()
-            {
-                [nameof(WaitingDialog.Message)] = "読込中",
-            }, new DialogOptions()
-            {
-                Width = "300px",
-                Height = "200px",
-                CloseDialogOnEsc = false,
-                CloseDialogOnOverlayClick = false,
-                ShowClose = false,
-            });
+            dialogService.OpenWaiting("読込中");
 
             try
             {

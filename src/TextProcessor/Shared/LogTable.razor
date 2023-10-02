@@ -2,7 +2,25 @@
     <div>
         <h4>ログ一覧</h4>
     </div>
-    <RadzenDataGrid TItem="LogInfo" AllowColumnResize="true" Data="Data">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+        <div>
+            <RadzenCheckBox TValue="bool" Style="margin-top: -15px" @bind-Value="ViewModel.ShowInfo.Value" />
+            <RadzenIcon Icon="info" IconStyle="IconStyle.Primary" />
+        </div>
+        <div>
+            <RadzenCheckBox TValue="bool" Style="margin-top: -15px" @bind-Value="ViewModel.ShowWarning.Value" />
+            <RadzenIcon Icon="warning" IconStyle="IconStyle.Warning" />
+        </div>
+        <div>
+            <RadzenCheckBox TValue="bool" Style="margin-top: -15px" @bind-Value="ViewModel.ShowError.Value" />
+            <RadzenIcon Icon="error" IconStyle="IconStyle.Danger" />
+        </div>
+        <div>
+            <RadzenCheckBox TValue="bool" Style="margin-top: -15px" @bind-Value="ViewModel.ShowSuccess.Value" />
+            <RadzenIcon Icon="check_circle" IconStyle="IconStyle.Success" />
+        </div>
+    </RadzenStack>
+    <RadzenDataGrid TItem="LogInfo" AllowColumnResize="true" Data="ViewModel.LogList">
         <Columns>
             <RadzenDataGridColumn TItem="LogInfo" Property="LogType" MinWidth="70px">
                 <Template>
@@ -50,9 +68,15 @@
 </RadzenStack>
 
 @code {
+    /// <summary>
+    /// スタイルを取得または設定します。
+    /// </summary>
     [Parameter]
     public string? Style { get; set; }
 
+    /// <summary>
+    /// ViewModelのインスタンスを取得または設定します。
+    /// </summary>
     [Parameter]
-    public required IEnumerable<LogInfo> Data { get; set; }
+    public required LogListViewModel ViewModel { get; set; }
 }

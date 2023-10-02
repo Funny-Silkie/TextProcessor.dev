@@ -252,6 +252,85 @@ namespace Test
         }
 
         /// <summary>
+        /// <see cref="ToUpperValueConversion"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void ToUpper()
+        {
+            var conversion = new ToUpperValueConversion();
+
+            ProcessStatus argResult = conversion.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            VerifyResult(conversion, "", "");
+            VerifyResult(conversion, "Hoge", "HOGE");
+            VerifyResult(conversion, "FUGA", "FUGA");
+            VerifyResult(conversion, "piyo", "PIYO");
+            VerifyResult(conversion, "123", "123");
+        }
+
+        /// <summary>
+        /// <see cref="ToLowerValueConversion"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void ToLower()
+        {
+            var conversion = new ToLowerValueConversion();
+
+            ProcessStatus argResult = conversion.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            VerifyResult(conversion, "", "");
+            VerifyResult(conversion, "Hoge", "hoge");
+            VerifyResult(conversion, "FUGA", "fuga");
+            VerifyResult(conversion, "piyo", "piyo");
+            VerifyResult(conversion, "123", "123");
+        }
+
+        /// <summary>
+        /// <see cref="RegexMatchValueConversion"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void RegexMatch1()
+        {
+            var conversion = new RegexMatchValueConversion()
+            {
+                Pattern = @"[a-z]+",
+            };
+
+            ProcessStatus argResult = conversion.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            VerifyResult(conversion, "", "");
+            VerifyResult(conversion, "Hoge", "oge");
+            VerifyResult(conversion, "FUGA", "");
+            VerifyResult(conversion, "piyo", "piyo");
+            VerifyResult(conversion, "123", "");
+        }
+
+        /// <summary>
+        /// <see cref="RegexMatchValueConversion"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void RegexMatch2()
+        {
+            var conversion = new RegexMatchValueConversion()
+            {
+                Pattern = @"[a-z]+",
+                CaseSensitive = false,
+            };
+
+            ProcessStatus argResult = conversion.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            VerifyResult(conversion, "", "");
+            VerifyResult(conversion, "Hoge", "Hoge");
+            VerifyResult(conversion, "FUGA", "FUGA");
+            VerifyResult(conversion, "piyo", "piyo");
+            VerifyResult(conversion, "123", "");
+        }
+
+        /// <summary>
         /// <see cref="AddValueConversion{T}"/>のテストを行います。
         /// </summary>
         [Test]

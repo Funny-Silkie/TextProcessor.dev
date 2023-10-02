@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TextProcessor.Logics.Operations;
 using TextProcessor.Logics.Operations.Conditions;
 
@@ -622,6 +623,28 @@ namespace Test
         }
 
         /// <summary>
+        /// <see cref="LargerValueCondition{T}"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void LargerAsDateOnly()
+        {
+            LargerValueCondition<DateOnly> condition = ValueConditionFactory.LargerAsDateOnly();
+            condition.Comparison = new DateOnly(1994, 4, 14);
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Match(""), Is.EqualTo(MatchResult.Error));
+                Assert.That(condition.Match("HogeHoge"), Is.EqualTo(MatchResult.Error));
+                Assert.That(condition.Match("2005/10/4"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("1994/4/14"), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("1965/2/23"), Is.EqualTo(MatchResult.NotMatched));
+            });
+        }
+
+        /// <summary>
         /// <see cref="LowerValueCondition{T}"/>のテストを行います。
         /// </summary>
         [Test]
@@ -666,6 +689,28 @@ namespace Test
                 Assert.That(condition.Match("1.4"), Is.EqualTo(MatchResult.NotMatched));
                 Assert.That(condition.Match("-1e+5"), Is.EqualTo(MatchResult.Matched));
                 Assert.That(condition.Match("1.1"), Is.EqualTo(MatchResult.NotMatched));
+            });
+        }
+
+        /// <summary>
+        /// <see cref="LowerValueCondition{T}"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void LowerAsDateOnly()
+        {
+            LowerValueCondition<DateOnly> condition = ValueConditionFactory.LowerAsDateOnly();
+            condition.Comparison = new DateOnly(1994, 4, 14);
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Match(""), Is.EqualTo(MatchResult.Error));
+                Assert.That(condition.Match("HogeHoge"), Is.EqualTo(MatchResult.Error));
+                Assert.That(condition.Match("2005/10/4"), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("1994/4/14"), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("1965/2/23"), Is.EqualTo(MatchResult.Matched));
             });
         }
 
@@ -718,6 +763,28 @@ namespace Test
         }
 
         /// <summary>
+        /// <see cref="LargerOrEqualValueCondition{T}"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void LargerOrEqualAsDateOnly()
+        {
+            LargerOrEqualValueCondition<DateOnly> condition = ValueConditionFactory.LargerOrEqualAsDateOnly();
+            condition.Comparison = new DateOnly(1994, 4, 14);
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Match(""), Is.EqualTo(MatchResult.Error));
+                Assert.That(condition.Match("HogeHoge"), Is.EqualTo(MatchResult.Error));
+                Assert.That(condition.Match("2005/10/4"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("1994/4/14"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("1965/2/23"), Is.EqualTo(MatchResult.NotMatched));
+            });
+        }
+
+        /// <summary>
         /// <see cref="LowerOrEqualValueCondition{T}"/>のテストを行います。
         /// </summary>
         [Test]
@@ -766,6 +833,28 @@ namespace Test
         }
 
         /// <summary>
+        /// <see cref="LowerOrEqualValueCondition{T}"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void LowerOrEqualAsDateOnly()
+        {
+            LowerOrEqualValueCondition<DateOnly> condition = ValueConditionFactory.LowerOrEqualAsDateOnly();
+            condition.Comparison = new DateOnly(1994, 4, 14);
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Match(""), Is.EqualTo(MatchResult.Error));
+                Assert.That(condition.Match("HogeHoge"), Is.EqualTo(MatchResult.Error));
+                Assert.That(condition.Match("2005/10/4"), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("1994/4/14"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("1965/2/23"), Is.EqualTo(MatchResult.Matched));
+            });
+        }
+
+        /// <summary>
         /// <see cref="EqualValueCondition{T}"/>のテストを行います。
         /// </summary>
         [Test]
@@ -810,6 +899,28 @@ namespace Test
                 Assert.That(condition.Match("1.4"), Is.EqualTo(MatchResult.NotMatched));
                 Assert.That(condition.Match("-1e+5"), Is.EqualTo(MatchResult.NotMatched));
                 Assert.That(condition.Match("1.1"), Is.EqualTo(MatchResult.Matched));
+            });
+        }
+
+        /// <summary>
+        /// <see cref="EqualValueCondition{T}"/>のテストを行います。
+        /// </summary>
+        [Test]
+        public void EqualAsDateOnly()
+        {
+            EqualValueCondition<DateOnly> condition = ValueConditionFactory.EqualAsDateOnly();
+            condition.Comparison = new DateOnly(1994, 4, 14);
+
+            ProcessStatus argResult = condition.VerifyArguments();
+            Assert.That(argResult.Success, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Match(""), Is.EqualTo(MatchResult.Error));
+                Assert.That(condition.Match("HogeHoge"), Is.EqualTo(MatchResult.Error));
+                Assert.That(condition.Match("2005/10/4"), Is.EqualTo(MatchResult.NotMatched));
+                Assert.That(condition.Match("1994/4/14"), Is.EqualTo(MatchResult.Matched));
+                Assert.That(condition.Match("1965/2/23"), Is.EqualTo(MatchResult.NotMatched));
             });
         }
     }
