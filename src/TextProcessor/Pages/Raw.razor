@@ -10,7 +10,7 @@
 @if (ViewModel.SelectedData.Value is not null)
 {
     <div>
-        <DsvView @ref="dsvView" Data="ViewModel.SelectedData.Value.Data" />
+        <DsvView @ref="dsvView" Style="width: calc(100vw - 320px); max-height: calc(100vh - 70px)" Data="ViewModel.SelectedData.Value.Data" />
     </div>
 }
 
