@@ -64,6 +64,7 @@ namespace TextProcessor.Logics.Operations
                 new DeleteRowOperation(),
                 new GenerateColumnOperation(),
                 new EditColumnOperation(),
+                new ChangeHeaderOperation(),
             };
         }
 
